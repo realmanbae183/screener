@@ -1,1 +1,1975 @@
-<!doctype html><meta charset="utf-8"><title>Screener</title><p>첫 실행 전입니다.
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>과매도 스크리너 — 2026-09-29</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* 레이아웃: 요약 스트립 위, 종목 카드 그리드 아래 — 화면 폭에 따라 1~3열 */
+:root{
+  --bg:#f6f5f2; --panel:#fffefb; --line:#e3e0d8; --line2:#d3cfc4;
+  --fg:#1c1b18; --mut:#6f6b61; --faint:#98938a;
+  --ink:#2b3a4a; --gold:#a8762a; --up:#1f7a4d; --dn:#b03c2e;
+  --s1:#8a8578; --s2:#c07a1f; --s3:#b03c2e;
+  --mono:'IBM Plex Mono','Consolas',monospace;
+  --sans:'IBM Plex Sans','Malgun Gothic','맑은 고딕',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14151a; --panel:#1c1e25; --line:#2b2e37; --line2:#3a3e49;
+  --fg:#eceae4; --mut:#9a9689; --faint:#6e6a61;
+  --ink:#a9c2dc; --gold:#d3a457; --up:#4fbc84; --dn:#e0715c;
+  --s1:#7d786c; --s2:#d3a457; --s3:#e0715c;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#14151a; --panel:#1c1e25; --line:#2b2e37; --line2:#3a3e49;
+  --fg:#eceae4; --mut:#9a9689; --faint:#6e6a61;
+  --ink:#a9c2dc; --gold:#d3a457; --up:#4fbc84; --dn:#e0715c;
+  --s1:#7d786c; --s2:#d3a457; --s3:#e0715c;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);
+     -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px;padding-block:32px 64px}
+
+.head{border-bottom:2px solid var(--fg);padding-bottom:18px;margin-bottom:22px}
+.kicker{font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+        color:var(--gold);font-weight:600}
+h1{font-size:clamp(24px,4vw,34px);margin:8px 0 6px;letter-spacing:-.02em;
+   text-wrap:balance}
+.sub{color:var(--mut);font-size:13px;margin:0}
+
+.funnel{display:flex;flex-wrap:wrap;gap:1px;background:var(--line);
+        border:1px solid var(--line);margin:22px 0 10px;border-radius:3px;
+        overflow:hidden}
+.fn{flex:1 1 130px;min-width:0;background:var(--panel);padding:12px 14px}
+.fn dt{font-size:11px;color:var(--mut);margin-bottom:5px}
+.fn dd{margin:0;font-family:var(--mono);font-size:21px;font-weight:600;
+       font-variant-numeric:tabular-nums}
+.fn.hl dd{color:var(--gold)}
+.note{font-size:12px;color:var(--faint);margin:0 0 30px}
+
+.grid{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:680px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:4px;
+      padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.t1{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.card.t2{border-color:var(--line2)}
+
+.card-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.id{min-width:0}
+.tk{font-family:var(--mono);font-size:19px;font-weight:600;letter-spacing:.01em}
+.nm{font-size:13px;color:var(--fg);margin-top:1px;overflow-wrap:anywhere}
+.sec{font-size:11px;color:var(--faint);margin-top:3px}
+.sc{text-align:right;flex-shrink:0}
+.sc-n{font-family:var(--mono);font-variant-numeric:tabular-nums;line-height:1}
+.sc-n b{font-size:26px;font-weight:600}
+.sc-n span{font-size:12px;color:var(--faint)}
+.sc-t{font-size:10px;letter-spacing:.1em;color:var(--mut);margin-top:5px}
+.t1 .sc-n b{color:var(--gold)}
+
+.bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink)}
+.t1 .bar i{background:var(--gold)}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 8px;margin:0}
+.stats>div{min-width:0}
+.stats dt{font-size:10px;color:var(--faint);margin-bottom:3px;
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stats dd{margin:0;font-family:var(--mono);font-size:13px;font-weight:500;
+          font-variant-numeric:tabular-nums}
+.s1 .dd{color:var(--s1)} .s2 .dd{color:var(--s2)} .s3 .dd{color:var(--s3);font-weight:600}
+.up{color:var(--up)} .dn{color:var(--dn)}
+
+.chips{display:flex;flex-wrap:wrap;gap:5px;border-top:1px solid var(--line);
+       padding-top:11px}
+.fund{border-top:1px solid var(--line);padding-top:11px;font-size:11.5px;
+      margin-top:auto}
+.fund.none{color:var(--faint)}
+.fund code{font-family:var(--mono);font-size:10.5px;background:var(--line);
+           padding:1px 4px;border-radius:2px}
+.fund-h{display:flex;justify-content:space-between;align-items:center;gap:8px;
+        margin-bottom:7px}
+.fund-h b{font-size:11px;font-weight:600}
+.gr{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:2px 7px;
+    border-radius:2px;white-space:nowrap}
+.g-a .gr{background:color-mix(in srgb,var(--up) 18%,transparent);color:var(--up)}
+.g-b .gr{background:color-mix(in srgb,var(--s2) 18%,transparent);color:var(--s2)}
+.g-c .gr{background:color-mix(in srgb,var(--dn) 18%,transparent);color:var(--dn)}
+.g-u .gr{background:var(--line);color:var(--mut)}
+.blk{display:inline-block;font-size:10.5px;color:var(--dn);font-weight:600;
+     margin-bottom:5px}
+.fund ul{margin:0;padding-left:15px;color:var(--mut);line-height:1.65}
+.fund li{margin-bottom:2px}
+.g-c{opacity:.72}
+
+.fin{margin-bottom:12px}
+.fin-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+       margin-bottom:6px}
+.fin-h b{font-size:11px;font-weight:600}
+.fin-n{font-family:var(--mono);font-size:19px;font-weight:600;
+       font-variant-numeric:tabular-nums;color:var(--ink)}
+.fin-n small{font-size:10px;color:var(--faint);font-weight:500;margin-left:2px}
+.fin-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;
+         margin-bottom:9px}
+.fin-bar i{display:block;height:100%;background:var(--ink)}
+/* 진입 사다리 */
+.lad{border-top:1px solid var(--line);padding-top:11px;margin-top:11px}
+.lad-h{display:flex;justify-content:space-between;align-items:center;gap:8px;
+       margin-bottom:7px;font-size:11px}
+.lad-h b{font-weight:600}
+.chan{font-size:10px;color:var(--s2);font-weight:600}
+.lad table{width:100%;border-collapse:collapse;font-size:11px}
+.lad th{font-size:9.5px;color:var(--faint);font-weight:500;text-align:right;
+        padding-bottom:3px}
+.lad th:first-child,.lad td.st{text-align:left}
+.lad td{padding:2.5px 0;font-family:var(--mono);font-variant-numeric:tabular-nums;
+        text-align:right;color:var(--mut)}
+.lad td.st{font-family:var(--sans);font-size:10px;color:var(--faint)}
+.lad tr.now td{color:var(--fg);font-weight:600}
+.lad tr.now td.st::after{content:" ●";color:var(--gold);font-size:8px}
+.lad td.wt{display:flex;align-items:center;gap:5px;justify-content:flex-end}
+.lad td.wt u{width:34px;height:3px;background:var(--line);border-radius:2px;
+             text-decoration:none;display:block;flex:0 0 34px}
+.lad td.wt i{display:block;height:100%;background:var(--ink);border-radius:2px;
+             opacity:.65}
+.lad td.wt b{font-weight:500;font-size:10px;min-width:28px}
+.lad td.at{color:var(--ink);font-weight:600}
+.inval{font-size:10px;color:var(--faint);margin-top:6px}
+
+/* 13F */
+.f13{border-top:1px solid var(--line);padding-top:11px;margin-top:11px;font-size:11px}
+.f13-h{display:flex;justify-content:space-between;align-items:center;gap:8px;
+       margin-bottom:6px}
+.f13-h b{font-size:11px;font-weight:600}
+.zn{font-size:10px;font-weight:600;padding:2px 7px;border-radius:2px}
+.z-ok .zn{background:color-mix(in srgb,var(--up) 18%,transparent);color:var(--up)}
+.z-hi .zn{background:color-mix(in srgb,var(--dn) 18%,transparent);color:var(--dn)}
+.z-lo .zn{background:color-mix(in srgb,var(--s2) 18%,transparent);color:var(--s2)}
+.z-u{color:var(--faint)}
+.f13-r{display:flex;align-items:baseline;gap:7px;color:var(--mut);
+       font-size:10.5px;margin-bottom:2px}
+.f13-r>span:first-child{flex:0 0 56px;color:var(--faint)}
+.f13-r b{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--fg)}
+.mv{font-size:10px;color:var(--faint)}
+.f13-note{font-size:9.5px;color:var(--faint);margin-top:6px;line-height:1.55}
+.f13-note b{color:var(--mut)}
+
+/* 기관 목록 — 이름 + 대표 인물 + 운용 성향 */
+.mgrs{list-style:none;margin:7px 0;padding:0;display:flex;flex-direction:column;
+      gap:3px}
+.mgrs li{display:flex;align-items:center;gap:6px;font-size:10.5px;min-width:0}
+.mgr{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+     color:var(--fg);font-weight:500}
+.mgr em{font-style:normal;color:var(--faint);font-weight:400}
+.sty{flex:0 0 auto;font-size:9px;padding:1.5px 5px;border-radius:2px;
+     white-space:nowrap}
+.y-val{background:color-mix(in srgb,var(--gold) 20%,transparent);color:var(--gold)}
+.y-act{background:color-mix(in srgb,var(--dn) 18%,transparent);color:var(--dn)}
+.y-turn{background:color-mix(in srgb,var(--s2) 18%,transparent);color:var(--s2)}
+.y-grow{background:color-mix(in srgb,var(--up) 18%,transparent);color:var(--up)}
+.y-macro,.y-quant,.y-multi,.y-etc{background:var(--line);color:var(--mut)}
+.act{flex:0 0 26px;text-align:right;font-size:9.5px;font-weight:600}
+.s-new .act{color:var(--up)}
+.s-add .act{color:var(--up);opacity:.8}
+.s-cut .act{color:var(--dn)}
+.s-keep .act{color:var(--faint);font-weight:400}
+.s-keep .mgr{color:var(--mut);font-weight:400}
+
+.fin-items{display:grid;grid-template-columns:repeat(2,1fr);gap:3px 10px}
+.fi{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--mut)}
+.fi span{flex:0 0 54px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fi u{flex:1;min-width:0;height:3px;background:var(--line);border-radius:2px;
+      text-decoration:none;display:block}
+.fi i{display:block;height:100%;background:var(--ink);border-radius:2px;
+      opacity:.6}
+.chip{font-size:10.5px;padding:3px 7px;border-radius:2px;border:1px solid transparent;
+      display:inline-flex;gap:5px;align-items:center;cursor:help}
+.chip b{font-family:var(--mono);font-weight:600}
+.chip.on{background:color-mix(in srgb,var(--ink) 13%,transparent);
+         border-color:color-mix(in srgb,var(--ink) 32%,transparent);color:var(--fg)}
+.chip.part{background:color-mix(in srgb,var(--ink) 6%,transparent);
+           border-color:var(--line2);color:var(--mut)}
+.chip.off{color:var(--faint);border-color:var(--line);text-decoration:line-through;
+          text-decoration-color:var(--line2)}
+.chip.off b{opacity:.45}
+
+.empty{background:var(--panel);border:1px dashed var(--line2);border-radius:4px;
+       padding:44px 20px;text-align:center;color:var(--mut)}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+      font-size:11.5px;color:var(--faint);line-height:1.75}
+@media print{body{background:#fff}.card{break-inside:avoid}}
+</style></head><body>
+<div class="wrap">
+  <header class="head">
+    <div class="kicker">Oversold Screener · 미국 주식</div>
+    <h1>추세는 살아있고 과하게 빠진 종목</h1>
+    <p class="sub">2026년 09월 29일 03:22 기준 · S&amp;P 500 + 다우 30 · 커트라인 10점</p>
+  </header>
+
+  <dl class="funnel">
+    <div class="fn"><dt>평가 종목</dt><dd>492</dd></div>
+    <div class="fn"><dt>추세 이탈 차단</dt><dd>78</dd></div>
+    <div class="fn"><dt>하락 채널 차단</dt><dd>0</dd></div>
+    <div class="fn"><dt>급락 직후 대기</dt><dd>4</dd></div>
+    <div class="fn"><dt>점수 미달</dt><dd>376</dd></div>
+    <div class="fn hl"><dt>최종 후보</dt><dd>34</dd></div>
+  </dl>
+  <p class="note">최우선 1종목 · 관심 7종목 · ④단계 통과 6 / 조건부 8 / 차단 1 ·
+     지표 칩에 마우스를 올리면 뜻이 나옵니다.</p>
+  
+
+  <div class="grid">
+<article class="card t2">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">GNRC</div>
+      <div class="nm">Generac</div>
+      <div class="sec">산업재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>13</b><span>/17</span></div>
+      <div class="sc-t">관심</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:76.5%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$205.21</dd></div>
+    <div class="s2"><dt>52주 고점 대비</dt><dd class="dd">−30.6%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-3.0%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+5.79%</dd></div>
+    <div><dt>RSI</dt><dd>30.5</dd></div>
+    <div><dt>ATR 이격</dt><dd>2.56배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip part" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>1.23</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.36</b></span><span class="chip on" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>3</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.07</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.85</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>1.22</b></span><span class="chip part" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0.57</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$205.21</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">46</td></tr><tr class=""><td class="st">2차</td><td class="pr">$200.82</td><td class="dr">-2.1%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">47</td></tr><tr class=""><td class="st">3차</td><td class="pr">$184.33</td><td class="dr">-10.2%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">53</td></tr><tr class=""><td class="st">4차</td><td class="pr">$175.03</td><td class="dr">-14.7%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">56</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$154.03</b>
+    (-24.9%) · 회복 목표 $211.63</div>
+</div>
+  <div class="fund g-a">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">82<small>/100 · A</small></span></div>
+  <div class="fin-bar"><i style="width:82%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:48%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:90%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:100%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:100%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:83%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:84%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:36%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">A · 통과</span></div>
+  <ul><li>재무 점수 82점 (A등급) · 강점 유동비율, 부채비율 · 약점 PBR</li><li>EPS 추정치 +11.6% 상향 중</li><li>매출총이익률 44.5% (유지·개선)</li><li>최근 30일 상향 15 / 하향 4</li></ul>
+</div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>8곳</b>
+    <span class="mv">신규 1 · 증가 1 · 감소 4</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">Coatue <em>필립 라퐁</em></span><span class="sty y-grow">성장주</span><span class="act">유지</span></li><li class="s-keep"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">유지</span></li><li class="s-cut"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 2곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$252.87</b>
+    <span class="mv">현재가 -18.9%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t2">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">ON</div>
+      <div class="nm">ON Semiconductor</div>
+      <div class="sec">정보기술</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>12</b><span>/17</span></div>
+      <div class="sc-t">관심</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:70.6%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$75.65</dd></div>
+    <div class="s3"><dt>52주 고점 대비</dt><dd class="dd">−43.5%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-5.4%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+12.57%</dd></div>
+    <div><dt>RSI</dt><dd>33.2</dd></div>
+    <div><dt>ATR 이격</dt><dd>1.8배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip part" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>0.55</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.01</b></span><span class="chip on" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>3</b></span><span class="chip part" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>0.88</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.91</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>1.92</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$75.65</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">55</td></tr><tr class=""><td class="st">2차</td><td class="pr">$68.59</td><td class="dr">-9.3%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">62</td></tr><tr class=""><td class="st">3차</td><td class="pr">$61.53</td><td class="dr">-18.7%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">71</td></tr><tr class=""><td class="st">4차</td><td class="pr">$55.66</td><td class="dr">-26.4%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">80</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$48.98</b>
+    (-35.2%) · 회복 목표 $93.75</div>
+</div>
+  <div class="fund g-a">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">80<small>/100 · B</small></span></div>
+  <div class="fin-bar"><i style="width:80%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:42%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:98%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:90%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:100%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:77%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:83%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:38%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">A · 통과</span></div>
+  <ul><li>재무 점수 80점 (B등급) · 강점 유동비율, 현금흐름 · 약점 PBR</li><li>EPS 추정치 +5.0% 상향 중</li><li>매출총이익률 38.4% (유지·개선)</li><li>최근 30일 상향 21 / 하향 5</li></ul>
+</div>
+  <div class="f13 z-lo">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">기관도 물림</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>8곳</b>
+    <span class="mv">신규 1 · 증가 6 · 감소 1</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">외 2곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$103.11</b>
+    <span class="mv">현재가 -26.6%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t2">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">CIEN</div>
+      <div class="nm">Ciena</div>
+      <div class="sec">정보기술</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>13</b><span>/17</span></div>
+      <div class="sc-t">관심</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:76.5%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$344.19</dd></div>
+    <div class="s3"><dt>52주 고점 대비</dt><dd class="dd">−45.1%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-11.4%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+19.31%</dd></div>
+    <div><dt>RSI</dt><dd>32.8</dd></div>
+    <div><dt>ATR 이격</dt><dd>2.82배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip part" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>1.47</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>0.96</b></span><span class="chip on" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>3</b></span><span class="chip part" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>0.9</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.64</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>2</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$344.19</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">58</td></tr><tr class=""><td class="st">2차</td><td class="pr">$317.46</td><td class="dr">-7.8%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">64</td></tr><tr class=""><td class="st">3차</td><td class="pr">$299.07</td><td class="dr">-13.1%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">69</td></tr><tr class=""><td class="st">4차</td><td class="pr">$253.94</td><td class="dr">-26.2%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">83</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$223.47</b>
+    (-35.1%) · 회복 목표 $438.90</div>
+</div>
+  <div class="fund g-a">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">77<small>/100 · B</small></span></div>
+  <div class="fin-bar"><i style="width:77%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:100%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:90%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:62%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:100%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:100%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:39%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:0%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">A · 통과</span></div>
+  <ul><li>재무 점수 77점 (B등급) · 강점 매출성장률, 유동비율 · 약점 PBR, 선행 PER</li><li>EPS 추정치 +28.4% 상향 중</li><li>매출총이익률 45.4% (유지·개선)</li><li>최근 30일 상향 7 / 하향 0</li></ul>
+</div>
+  <div class="f13 z-lo">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">기관도 물림</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>8곳</b>
+    <span class="mv">증가 5 · 감소 2</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">유지</span></li><li class="s-keep"><span class="mgr">외 2곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$494.77</b>
+    <span class="mv">현재가 -30.4%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">ROP</div>
+      <div class="nm">Roper Technologies</div>
+      <div class="sec">정보기술</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>11</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:64.7%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$354.00</dd></div>
+    <div class="s2"><dt>52주 고점 대비</dt><dd class="dd">−31.4%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-4.3%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="dn">-6.50%</dd></div>
+    <div><dt>RSI</dt><dd>27.5</dd></div>
+    <div><dt>ATR 이격</dt><dd>3.46배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.05</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>3</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.3</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.24</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>1.27</b></span><span class="chip part" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0.27</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$354.00</td><td class="dr">현재</td><td class="wt"><u><i style="width:44%"></i></u><b>44%</b></td><td class="at">42</td></tr><tr class=""><td class="st">2차</td><td class="pr">$334.05</td><td class="dr">-5.6%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">45</td></tr><tr class=""><td class="st">3차</td><td class="pr">$315.46</td><td class="dr">-10.9%</td><td class="wt"><u><i style="width:22%"></i></u><b>22%</b></td><td class="at">49</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$277.60</b>
+    (-21.6%) · 회복 목표 $369.87</div>
+</div>
+  <div class="fund g-a">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">73<small>/100 · B</small></span></div>
+  <div class="fin-bar"><i style="width:73%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:65%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:100%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:93%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:0%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:74%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:91%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:83%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">A · 통과</span></div>
+  <ul><li>재무 점수 73점 (B등급) · 강점 현금흐름, 영업이익률 · 약점 유동비율</li><li>EPS 추정치 +2.1% 유지 — 밸류에이션만 조정</li><li>매출총이익률 69.7% (유지·개선)</li><li>최근 30일 상향 13 / 하향 3</li></ul>
+</div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>6곳</b>
+    <span class="mv">신규 1 · 증가 2 · 감소 3</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$340.11</b>
+    <span class="mv">현재가 +4.1%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">HRL</div>
+      <div class="nm">Hormel Foods</div>
+      <div class="sec">필수소비재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>11</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:64.7%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$19.97</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−23.8%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-12.7%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+1.20%</dd></div>
+    <div><dt>RSI</dt><dd>21.6</dd></div>
+    <div><dt>ATR 이격</dt><dd>4.75배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>3</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.15</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.73</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>2</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.85</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$19.97</td><td class="dr">현재</td><td class="wt"><u><i style="width:44%"></i></u><b>44%</b></td><td class="at">46</td></tr><tr class=""><td class="st">2차</td><td class="pr">$19.51</td><td class="dr">-2.3%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">48</td></tr><tr class=""><td class="st">3차</td><td class="pr">$18.03</td><td class="dr">-9.7%</td><td class="wt"><u><i style="width:22%"></i></u><b>22%</b></td><td class="at">53</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$15.87</b>
+    (-20.5%) · 회복 목표 $22.87</div>
+</div>
+  <div class="fund g-a">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">71<small>/100 · B</small></span></div>
+  <div class="fin-bar"><i style="width:71%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:22%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:43%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:100%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:90%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:31%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:97%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:92%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">A · 통과</span></div>
+  <ul><li>재무 점수 71점 (B등급) · 강점 부채비율, 현금흐름 · 약점 ROE, 매출성장률</li><li>EPS 추정치 -0.5% 유지 — 밸류에이션만 조정</li><li>매출총이익률 15.9% (유지·개선)</li><li>최근 30일 상향 2 / 하향 4</li></ul>
+</div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>7곳</b>
+    <span class="mv">증가 3 · 감소 3</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">유지</span></li><li class="s-cut"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 1곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$22.03</b>
+    <span class="mv">현재가 -9.3%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t2">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">ATO</div>
+      <div class="nm">Atmos Energy</div>
+      <div class="sec">유틸리티</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>12</b><span>/17</span></div>
+      <div class="sc-t">관심</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:70.6%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$157.05</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−17.4%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-9.2%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+0.02%</dd></div>
+    <div><dt>RSI</dt><dd>22.8</dd></div>
+    <div><dt>ATR 이격</dt><dd>3.43배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.03</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>0.93</b></span><span class="chip on" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>3</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.64</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.66</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.51</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b><span class="chan">하락 채널 — 1차 비중 축소</span></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$157.05</td><td class="dr">현재</td><td class="wt"><u><i style="width:44%"></i></u><b>44%</b></td><td class="at">41</td></tr><tr class=""><td class="st">2차</td><td class="pr">$152.59</td><td class="dr">-2.8%</td><td class="wt"><u><i style="width:56%"></i></u><b>56%</b></td><td class="at">43</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$134.28</b>
+    (-14.5%) · 회복 목표 $173.00</div>
+</div>
+  <div class="fund g-a">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">57<small>/100 · C</small></span></div>
+  <div class="fin-bar"><i style="width:57%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:49%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:100%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:0%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:88%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:1%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:59%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:81%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:85%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">A · 통과</span></div>
+  <ul><li>재무 점수 57점 (C등급) · 강점 영업이익률, 부채비율 · 약점 현금흐름, 유동비율</li><li>EPS 추정치 +0.4% 유지 — 밸류에이션만 조정</li><li>매출총이익률 73.7% (유지·개선)</li><li>최근 30일 상향 3 / 하향 1</li></ul>
+</div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>8곳</b>
+    <span class="mv">신규 3 · 증가 5</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">신규</span></li><li class="s-new"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">신규</span></li><li class="s-new"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">외 2곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$175.06</b>
+    <span class="mv">현재가 -10.3%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t1">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">ALB</div>
+      <div class="nm">Albemarle Corporation</div>
+      <div class="sec">소재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>14</b><span>/17</span></div>
+      <div class="sc-t">최우선</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:82.4%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$107.39</dd></div>
+    <div class="s3"><dt>52주 고점 대비</dt><dd class="dd">−49.9%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-30.7%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+4.86%</dd></div>
+    <div><dt>RSI</dt><dd>29.1</dd></div>
+    <div><dt>ATR 이격</dt><dd>3.63배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.21</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.02</b></span><span class="chip on" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>3</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.18</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.61</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>2</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b><span class="chan">하락 채널 — 1차 비중 축소</span></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$107.39</td><td class="dr">현재</td><td class="wt"><u><i style="width:27%"></i></u><b>27%</b></td><td class="at">72</td></tr><tr class=""><td class="st">2차</td><td class="pr">$97.08</td><td class="dr">-9.6%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">81</td></tr><tr class=""><td class="st">3차</td><td class="pr">$86.76</td><td class="dr">-19.2%</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">92</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$76.35</b>
+    (-28.9%) · 회복 목표 $155.00</div>
+</div>
+  <div class="fund g-b">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">88<small>/100 · A</small></span></div>
+  <div class="fin-bar"><i style="width:88%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:13%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:100%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:100%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:100%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:100%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:100%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:88%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">B · 주의</span></div>
+  <ul><li>재무 점수 88점 (A등급) · 강점 선행 PER, 매출성장률 · 약점 ROE</li><li>EPS 추정치 -6.5% — 구조적 침식 의심</li><li>매출총이익률 33.9% (유지·개선)</li><li>최근 30일 상향 4 / 하향 11</li></ul>
+</div>
+  <div class="f13 z-lo">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">기관도 물림</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>8곳</b>
+    <span class="mv">증가 3 · 감소 5</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 2곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$174.85</b>
+    <span class="mv">현재가 -38.6%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">PYPL</div>
+      <div class="nm">PayPal</div>
+      <div class="sec">금융</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>11</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:64.7%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$54.28</dd></div>
+    <div class="s2"><dt>52주 고점 대비</dt><dd class="dd">−27.9%</dd></div>
+    <div><dt>200일선 대비</dt><dd>+8.2%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="dn">-5.95%</dd></div>
+    <div><dt>RSI</dt><dd>32.3</dd></div>
+    <div><dt>ATR 이격</dt><dd>3.76배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.33</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.19</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip part" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>0.94</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>2</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>1.08</b></span><span class="chip on" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>1.57</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$54.28</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">41</td></tr><tr class=""><td class="st">2차</td><td class="pr">$52.70</td><td class="dr">-2.9%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">41</td></tr><tr class=""><td class="st">3차</td><td class="pr">$50.83</td><td class="dr">-6.4%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">43</td></tr><tr class=""><td class="st">4차</td><td class="pr">$47.38</td><td class="dr">-12.7%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">47</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$41.69</b>
+    (-23.2%) · 회복 목표 $52.70</div>
+</div>
+  <div class="fund g-b">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">78<small>/100 · B</small></span></div>
+  <div class="fin-bar"><i style="width:78%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:100%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:85%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:85%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:41%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:59%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:100%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:73%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">B · 조건부</span></div>
+  <ul><li>재무 점수 78점 (B등급) · 강점 선행 PER, 현금흐름</li><li>EPS 추정치 +0.6% 유지 — 밸류에이션만 조정</li><li>매출총이익률 -1.1%p</li><li>최근 30일 상향 26 / 하향 11</li></ul>
+</div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>9곳</b>
+    <span class="mv">증가 4 · 감소 4</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">Coatue <em>필립 라퐁</em></span><span class="sty y-grow">성장주</span><span class="act">유지</span></li><li class="s-cut"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 3곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$44.97</b>
+    <span class="mv">현재가 +20.7%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t2">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">DAL</div>
+      <div class="nm">Delta Air Lines</div>
+      <div class="sec">산업재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>12</b><span>/17</span></div>
+      <div class="sc-t">관심</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:70.6%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$84.03</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−10.1%</dd></div>
+    <div><dt>200일선 대비</dt><dd>+11.7%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+11.27%</dd></div>
+    <div><dt>RSI</dt><dd>29.5</dd></div>
+    <div><dt>ATR 이격</dt><dd>3.86배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.41</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>3</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.15</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.06</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.11</b></span><span class="chip on" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>1.71</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$84.03</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">39</td></tr><tr class=""><td class="st">2차</td><td class="pr">$80.03</td><td class="dr">-4.8%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">39</td></tr><tr class=""><td class="st">3차</td><td class="pr">$75.25</td><td class="dr">-10.4%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">39</td></tr><tr class=""><td class="st">4차</td><td class="pr">$57.64</td><td class="dr">-31.4%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">56</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$50.72</b>
+    (-39.6%) · 회복 목표 $75.25</div>
+</div>
+  <div class="fund g-b">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">70<small>/100 · B</small></span></div>
+  <div class="fin-bar"><i style="width:70%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:100%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:40%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:69%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:0%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:100%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:100%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:70%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">B · 조건부</span></div>
+  <ul><li>재무 점수 70점 (B등급) · 강점 선행 PER, 매출성장률 · 약점 유동비율, 영업이익률</li><li>EPS 추정치 +8.7% 상향 중</li><li>매출총이익률 -1.4%p</li><li>최근 30일 상향 0 / 하향 1</li></ul>
+</div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>8곳</b>
+    <span class="mv">신규 1 · 증가 1 · 감소 5</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">Berkshire Hathaway <em>워렌 버핏</em></span><span class="sty y-val">가치투자</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">유지</span></li><li class="s-cut"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 2곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$74.81</b>
+    <span class="mv">현재가 +12.3%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t2">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">PTC</div>
+      <div class="nm">PTC Inc.</div>
+      <div class="sec">정보기술</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>13</b><span>/17</span></div>
+      <div class="sc-t">관심</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:76.5%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$139.69</dd></div>
+    <div class="s2"><dt>52주 고점 대비</dt><dd class="dd">−32.1%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-4.2%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="dn">-9.99%</dd></div>
+    <div><dt>RSI</dt><dd>32.8</dd></div>
+    <div><dt>ATR 이격</dt><dd>3.73배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.3</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>2.86</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip part" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>0.9</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>2</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>1.31</b></span><span class="chip part" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0.81</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$139.69</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">42</td></tr><tr class=""><td class="st">2차</td><td class="pr">$132.35</td><td class="dr">-5.3%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">45</td></tr><tr class=""><td class="st">3차</td><td class="pr">$120.24</td><td class="dr">-13.9%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">51</td></tr><tr class=""><td class="st">4차</td><td class="pr">$112.33</td><td class="dr">-19.6%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">56</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$98.85</b>
+    (-29.2%) · 회복 목표 $145.79</div>
+</div>
+  <div class="fund g-b">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">66<small>/100 · B</small></span></div>
+  <div class="fin-bar"><i style="width:66%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:100%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:100%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:100%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:19%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:13%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:87%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:31%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">B · 조건부</span></div>
+  <ul><li>재무 점수 66점 (B등급) · 강점 부채비율, 현금흐름 · 약점 매출성장률, 유동비율</li><li>EPS 추정치 +3.1% 상향 중</li><li>매출총이익률 -5.2%p</li><li>최근 30일 상향 3 / 하향 0</li></ul>
+</div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>6곳</b>
+    <span class="mv">신규 1 · 증가 3 · 감소 2</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$132.06</b>
+    <span class="mv">현재가 +5.8%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">CASY</div>
+      <div class="nm">Casey&#x27;s</div>
+      <div class="sec">필수소비재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>11</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:64.7%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$606.24</dd></div>
+    <div class="s2"><dt>52주 고점 대비</dt><dd class="dd">−33.8%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-17.0%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+10.36%</dd></div>
+    <div><dt>RSI</dt><dd>18.3</dd></div>
+    <div><dt>ATR 이격</dt><dd>5.0배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>3</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>0.53</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.98</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>2</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>1.39</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$606.24</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">48</td></tr><tr class=""><td class="st">2차</td><td class="pr">$584.83</td><td class="dr">-3.5%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">50</td></tr><tr class=""><td class="st">3차</td><td class="pr">$556.91</td><td class="dr">-8.1%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">54</td></tr><tr class=""><td class="st">4차</td><td class="pr">$507.58</td><td class="dr">-16.3%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">61</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$446.67</b>
+    (-26.3%) · 회복 목표 $730.18</div>
+</div>
+  <div class="fund g-b">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">64<small>/100 · C</small></span></div>
+  <div class="fin-bar"><i style="width:64%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:100%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:32%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:86%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:18%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:100%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:51%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:10%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">B · 조건부</span></div>
+  <ul><li>재무 점수 64점 (C등급) · 강점 매출성장률, 현금흐름 · 약점 PBR, 유동비율</li><li>EPS 추정치 -0.5% 유지 — 밸류에이션만 조정</li><li>매출총이익률 -3.1%p</li><li>최근 30일 상향 6 / 하향 1</li></ul>
+</div>
+  <div class="f13 z-u"><b>⑤ 13F</b> <span>주요 기관 보유 목록에 없음</span></div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">EIX</div>
+      <div class="nm">Edison International</div>
+      <div class="sec">유틸리티</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>11</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:64.7%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$51.47</dd></div>
+    <div class="s2"><dt>52주 고점 대비</dt><dd class="dd">−36.0%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-23.5%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+6.58%</dd></div>
+    <div><dt>RSI</dt><dd>22.2</dd></div>
+    <div><dt>ATR 이격</dt><dd>4.57배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>3</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>0.89</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.69</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>2</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>1.51</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$51.47</td><td class="dr">현재</td><td class="wt"><u><i style="width:44%"></i></u><b>44%</b></td><td class="at">52</td></tr><tr class=""><td class="st">2차</td><td class="pr">$47.04</td><td class="dr">-8.6%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">59</td></tr><tr class=""><td class="st">3차</td><td class="pr">$42.60</td><td class="dr">-17.2%</td><td class="wt"><u><i style="width:22%"></i></u><b>22%</b></td><td class="at">67</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$37.49</b>
+    (-27.2%) · 회복 목표 $67.32</div>
+</div>
+  <div class="fund g-b">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">58<small>/100 · C</small></span></div>
+  <div class="fin-bar"><i style="width:58%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:98%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:100%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:0%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:0%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:23%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:100%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:97%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">B · 조건부</span></div>
+  <ul><li>재무 점수 58점 (C등급) · 강점 선행 PER, 현금흐름 · 약점 부채비율, 유동비율</li><li>EPS 추정치 -0.1% 유지 — 밸류에이션만 조정</li><li>매출총이익률 -0.7%p</li><li>최근 30일 상향 2 / 하향 1</li></ul>
+</div>
+  <div class="f13 z-lo">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">기관도 물림</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>7곳</b>
+    <span class="mv">신규 1 · 증가 3 · 감소 3</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 1곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$70.30</b>
+    <span class="mv">현재가 -26.8%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">PCG</div>
+      <div class="nm">PG&amp;E Corporation</div>
+      <div class="sec">유틸리티</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>11</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:64.7%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$11.95</dd></div>
+    <div class="s2"><dt>52주 고점 대비</dt><dd class="dd">−37.1%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-27.7%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+0.77%</dd></div>
+    <div><dt>RSI</dt><dd>22.0</dd></div>
+    <div><dt>ATR 이격</dt><dd>4.73배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>3</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>0.88</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.7</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>2</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>1.57</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b><span class="chan">하락 채널 — 1차 비중 축소</span></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$11.95</td><td class="dr">현재</td><td class="wt"><u><i style="width:27%"></i></u><b>27%</b></td><td class="at">54</td></tr><tr class=""><td class="st">2차</td><td class="pr">$10.75</td><td class="dr">-10.0%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">63</td></tr><tr class=""><td class="st">3차</td><td class="pr">$9.55</td><td class="dr">-20.1%</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">74</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$8.40</b>
+    (-29.7%) · 회복 목표 $16.53</div>
+</div>
+  <div class="fund g-b">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">50<small>/100 · D</small></span></div>
+  <div class="fin-bar"><i style="width:50%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:47%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:100%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:0%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:7%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:35%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:41%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:100%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:100%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">B · 조건부</span></div>
+  <ul><li>재무 점수 50점 (D등급) · 강점 PBR, 선행 PER · 약점 현금흐름, 부채비율</li><li>EPS 추정치 -0.1% 유지 — 밸류에이션만 조정</li><li>매출총이익률 41.5% (유지·개선)</li><li>최근 30일 상향 2 / 하향 5</li></ul>
+</div>
+  <div class="f13 z-lo">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">기관도 물림</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>8곳</b>
+    <span class="mv">신규 1 · 증가 4 · 감소 2</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">유지</span></li><li class="s-keep"><span class="mgr">외 2곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$16.80</b>
+    <span class="mv">현재가 -28.9%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">ARES</div>
+      <div class="nm">Ares Management</div>
+      <div class="sec">금융</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>11</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:64.7%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$118.34</dd></div>
+    <div class="s2"><dt>52주 고점 대비</dt><dd class="dd">−30.9%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-7.7%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="dn">-4.23%</dd></div>
+    <div><dt>RSI</dt><dd>32.1</dd></div>
+    <div><dt>ATR 이격</dt><dd>2.68배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip part" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>1.34</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>2.6</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip part" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>0.95</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.8</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>1.24</b></span><span class="chip part" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0.98</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$118.34</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">36</td></tr><tr class=""><td class="st">2차</td><td class="pr">$109.95</td><td class="dr">-7.1%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">41</td></tr><tr class=""><td class="st">3차</td><td class="pr">$100.21</td><td class="dr">-15.3%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">47</td></tr><tr class=""><td class="st">4차</td><td class="pr">$93.27</td><td class="dr">-21.2%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">53</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$82.08</b>
+    (-30.6%) · 회복 목표 $128.23</div>
+</div>
+  <div class="fund g-b">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">49<small>/100 · D</small></span></div>
+  <div class="fin-bar"><i style="width:49%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:75%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:48%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:19%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:0%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:79%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:84%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:0%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">B · 주의</span></div>
+  <ul><li>재무 점수 49점 (D등급) · 강점 현금흐름, 선행 PER · 약점 유동비율, PBR</li><li>EPS 추정치 -1.8% 유지 — 밸류에이션만 조정</li><li>매출총이익률 -8.4%p</li><li>최근 30일 상향 3 / 하향 7</li></ul>
+</div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>7곳</b>
+    <span class="mv">신규 2 · 증가 1 · 감소 4</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Third Point <em>댄 러브</em></span><span class="sty y-act">액티비스트</span><span class="act">신규</span></li><li class="s-new"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 1곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$116.42</b>
+    <span class="mv">현재가 +1.7%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">DLTR</div>
+      <div class="nm">Dollar Tree</div>
+      <div class="sec">필수소비재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>11</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:64.7%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$116.02</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−17.8%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-1.3%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+6.66%</dd></div>
+    <div><dt>RSI</dt><dd>30.4</dd></div>
+    <div><dt>ATR 이격</dt><dd>3.0배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>1.64</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.44</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.08</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>2</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.53</b></span><span class="chip on" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>1.79</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$116.02</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">33</td></tr><tr class=""><td class="st">2차</td><td class="pr">$114.01</td><td class="dr">-1.7%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">34</td></tr><tr class=""><td class="st">3차</td><td class="pr">$107.72</td><td class="dr">-7.1%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">38</td></tr><tr class=""><td class="st">4차</td><td class="pr">$99.42</td><td class="dr">-14.3%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">43</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$87.49</b>
+    (-24.6%) · 회복 목표 $117.59</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>8곳</b>
+    <span class="mv">증가 5 · 감소 3</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 2곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$104.68</b>
+    <span class="mv">현재가 +10.8%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">TJX</div>
+      <div class="nm">TJX Companies</div>
+      <div class="sec">경기소비재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$130.25</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−22.4%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-14.4%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+0.20%</dd></div>
+    <div><dt>RSI</dt><dd>15.5</dd></div>
+    <div><dt>ATR 이격</dt><dd>4.73배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>3</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.45</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>2</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.07</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.78</b></span><span class="chip part" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0.08</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b><span class="chan">하락 채널 — 1차 비중 축소</span></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$130.25</td><td class="dr">현재</td><td class="wt"><u><i style="width:27%"></i></u><b>27%</b></td><td class="at">42</td></tr><tr class=""><td class="st">2차</td><td class="pr">$124.42</td><td class="dr">-4.5%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">45</td></tr><tr class=""><td class="st">3차</td><td class="pr">$118.59</td><td class="dr">-8.9%</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">48</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$104.36</b>
+    (-19.9%) · 회복 목표 $152.24</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-u"><b>⑤ 13F</b> <span>주요 기관 보유 목록에 없음</span></div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">HIG</div>
+      <div class="nm">Hartford (The)</div>
+      <div class="sec">금융</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$126.04</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−13.1%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-6.7%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+2.07%</dd></div>
+    <div><dt>RSI</dt><dd>23.6</dd></div>
+    <div><dt>ATR 이격</dt><dd>4.21배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.74</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>2.11</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.59</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.68</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.28</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$126.04</td><td class="dr">현재</td><td class="wt"><u><i style="width:44%"></i></u><b>44%</b></td><td class="at">37</td></tr><tr class=""><td class="st">2차</td><td class="pr">$121.32</td><td class="dr">-3.7%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">39</td></tr><tr class=""><td class="st">3차</td><td class="pr">$116.60</td><td class="dr">-7.5%</td><td class="wt"><u><i style="width:22%"></i></u><b>22%</b></td><td class="at">41</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$102.61</b>
+    (-18.6%) · 회복 목표 $135.02</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-u"><b>⑤ 13F</b> <span>주요 기관 보유 목록에 없음</span></div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">ALLE</div>
+      <div class="nm">Allegion</div>
+      <div class="sec">산업재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$155.38</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−12.6%</dd></div>
+    <div><dt>200일선 대비</dt><dd>+4.0%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="dn">-2.83%</dd></div>
+    <div><dt>RSI</dt><dd>38.1</dd></div>
+    <div><dt>ATR 이격</dt><dd>2.75배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip part" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>1.41</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>3</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip part" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>0.51</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.5</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.25</b></span><span class="chip on" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>1.55</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$155.38</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">32</td></tr><tr class=""><td class="st">2차</td><td class="pr">$151.21</td><td class="dr">-2.7%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">32</td></tr><tr class=""><td class="st">3차</td><td class="pr">$144.95</td><td class="dr">-6.7%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">34</td></tr><tr class=""><td class="st">4차</td><td class="pr">$136.04</td><td class="dr">-12.4%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">38</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$119.72</b>
+    (-22.9%) · 회복 목표 $149.35</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>5곳</b>
+    <span class="mv">증가 3 · 감소 2</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$135.15</b>
+    <span class="mv">현재가 +15.0%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">NEE</div>
+      <div class="nm">NextEra Energy</div>
+      <div class="sec">유틸리티</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$75.49</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−21.7%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-12.6%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+1.75%</dd></div>
+    <div><dt>RSI</dt><dd>19.6</dd></div>
+    <div><dt>ATR 이격</dt><dd>4.31배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.83</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>0.88</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.88</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.81</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.74</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b><span class="chan">하락 채널 — 1차 비중 축소</span></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$75.49</td><td class="dr">현재</td><td class="wt"><u><i style="width:27%"></i></u><b>27%</b></td><td class="at">40</td></tr><tr class=""><td class="st">2차</td><td class="pr">$72.90</td><td class="dr">-3.4%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">42</td></tr><tr class=""><td class="st">3차</td><td class="pr">$70.32</td><td class="dr">-6.9%</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">45</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$61.88</b>
+    (-18.0%) · 회복 목표 $86.38</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>6곳</b>
+    <span class="mv">증가 2 · 감소 4</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$88.71</b>
+    <span class="mv">현재가 -14.9%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">LIN</div>
+      <div class="nm">Linde plc</div>
+      <div class="sec">소재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$472.04</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−13.4%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-2.1%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+3.58%</dd></div>
+    <div><dt>RSI</dt><dd>29.5</dd></div>
+    <div><dt>ATR 이격</dt><dd>2.33배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip part" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>1.03</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.04</b></span><span class="chip on" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>3</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.15</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.54</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.29</b></span><span class="chip part" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0.09</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$472.04</td><td class="dr">현재</td><td class="wt"><u><i style="width:57%"></i></u><b>57%</b></td><td class="at">33</td></tr><tr class=""><td class="st">2차</td><td class="pr">$457.50</td><td class="dr">-3.1%</td><td class="wt"><u><i style="width:43%"></i></u><b>43%</b></td><td class="at">35</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$402.60</b>
+    (-14.7%) · 회복 목표 $482.07</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>8곳</b>
+    <span class="mv">신규 1 · 증가 1 · 감소 5</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Lone Pine <em>스티븐 맨델 창업</em></span><span class="sty y-grow">성장주</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">유지</span></li><li class="s-cut"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 2곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$503.98</b>
+    <span class="mv">현재가 -6.3%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">DTE</div>
+      <div class="nm">DTE Energy</div>
+      <div class="sec">유틸리티</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$120.83</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−21.0%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-12.9%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+1.02%</dd></div>
+    <div><dt>RSI</dt><dd>16.4</dd></div>
+    <div><dt>ATR 이격</dt><dd>4.29배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.81</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.16</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>2</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.45</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.7</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b><span class="chan">하락 채널 — 1차 비중 축소</span></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$120.83</td><td class="dr">현재</td><td class="wt"><u><i style="width:27%"></i></u><b>27%</b></td><td class="at">40</td></tr><tr class=""><td class="st">2차</td><td class="pr">$116.50</td><td class="dr">-3.6%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">43</td></tr><tr class=""><td class="st">3차</td><td class="pr">$112.17</td><td class="dr">-7.2%</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">45</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$98.71</b>
+    (-18.3%) · 회복 목표 $138.76</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>7곳</b>
+    <span class="mv">신규 1 · 증가 3 · 감소 3</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 1곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$143.42</b>
+    <span class="mv">현재가 -15.8%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">LUV</div>
+      <div class="nm">Southwest Airlines</div>
+      <div class="sec">산업재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$42.28</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−21.8%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-1.9%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+8.48%</dd></div>
+    <div><dt>RSI</dt><dd>25.2</dd></div>
+    <div><dt>ATR 이격</dt><dd>3.83배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.39</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.58</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.47</b></span><span class="chip part" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>0.85</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.75</b></span><span class="chip on" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>1.14</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$42.28</td><td class="dr">현재</td><td class="wt"><u><i style="width:44%"></i></u><b>44%</b></td><td class="at">33</td></tr><tr class=""><td class="st">2차</td><td class="pr">$39.84</td><td class="dr">-5.8%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">37</td></tr><tr class=""><td class="st">3차</td><td class="pr">$37.04</td><td class="dr">-12.4%</td><td class="wt"><u><i style="width:22%"></i></u><b>22%</b></td><td class="at">41</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$32.60</b>
+    (-22.9%) · 회복 목표 $43.12</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>4곳</b>
+    <span class="mv">신규 1 · 증가 2 · 감소 1</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$41.79</b>
+    <span class="mv">현재가 +1.2%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">EME</div>
+      <div class="nm">Emcor</div>
+      <div class="sec">산업재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$765.52</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−18.8%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-0.5%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+4.91%</dd></div>
+    <div><dt>RSI</dt><dd>37.9</dd></div>
+    <div><dt>ATR 이격</dt><dd>2.13배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip part" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>0.84</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>0.9</b></span><span class="chip on" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>3</b></span><span class="chip part" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>0.53</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.11</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.59</b></span><span class="chip on" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>1.11</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$765.52</td><td class="dr">현재</td><td class="wt"><u><i style="width:44%"></i></u><b>44%</b></td><td class="at">32</td></tr><tr class=""><td class="st">2차</td><td class="pr">$730.43</td><td class="dr">-4.6%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">35</td></tr><tr class=""><td class="st">3차</td><td class="pr">$672.48</td><td class="dr">-12.2%</td><td class="wt"><u><i style="width:22%"></i></u><b>22%</b></td><td class="at">40</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$591.78</b>
+    (-22.7%) · 회복 목표 $769.43</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>8곳</b>
+    <span class="mv">증가 4 · 감소 3</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">유지</span></li><li class="s-cut"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 2곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$843.95</b>
+    <span class="mv">현재가 -9.3%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">PAYX</div>
+      <div class="nm">Paychex</div>
+      <div class="sec">산업재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$99.30</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−22.0%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-3.1%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+0.29%</dd></div>
+    <div><dt>RSI</dt><dd>20.4</dd></div>
+    <div><dt>ATR 이격</dt><dd>4.92배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>3</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>0.84</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.82</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.66</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.76</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$99.30</td><td class="dr">현재</td><td class="wt"><u><i style="width:44%"></i></u><b>44%</b></td><td class="at">34</td></tr><tr class=""><td class="st">2차</td><td class="pr">$92.74</td><td class="dr">-6.6%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">38</td></tr><tr class=""><td class="st">3차</td><td class="pr">$86.18</td><td class="dr">-13.2%</td><td class="wt"><u><i style="width:22%"></i></u><b>22%</b></td><td class="at">43</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$75.84</b>
+    (-23.6%) · 회복 목표 $102.47</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>6곳</b>
+    <span class="mv">증가 5 · 감소 1</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$93.05</b>
+    <span class="mv">현재가 +6.7%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">AKAM</div>
+      <div class="nm">Akamai Technologies</div>
+      <div class="sec">정보기술</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$108.99</dd></div>
+    <div class="s2"><dt>52주 고점 대비</dt><dd class="dd">−32.4%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-2.0%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+10.36%</dd></div>
+    <div><dt>RSI</dt><dd>36.7</dd></div>
+    <div><dt>ATR 이격</dt><dd>1.83배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip part" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>0.57</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.5</b></span><span class="chip on" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>3</b></span><span class="chip part" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>0.61</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.02</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>1.32</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$108.99</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">34</td></tr><tr class=""><td class="st">2차</td><td class="pr">$95.85</td><td class="dr">-12.1%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">42</td></tr><tr class=""><td class="st">3차</td><td class="pr">$88.84</td><td class="dr">-18.5%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">47</td></tr><tr class=""><td class="st">4차</td><td class="pr">$82.71</td><td class="dr">-24.1%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">52</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$72.78</b>
+    (-33.2%) · 회복 목표 $112.80</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>6곳</b>
+    <span class="mv">증가 6</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$126.44</b>
+    <span class="mv">현재가 -13.8%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">WY</div>
+      <div class="nm">Weyerhaeuser</div>
+      <div class="sec">부동산</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$19.72</dd></div>
+    <div class="s2"><dt>52주 고점 대비</dt><dd class="dd">−25.3%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-17.3%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+1.03%</dd></div>
+    <div><dt>RSI</dt><dd>22.1</dd></div>
+    <div><dt>ATR 이격</dt><dd>4.01배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.56</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.37</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.7</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.46</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.93</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$19.72</td><td class="dr">현재</td><td class="wt"><u><i style="width:44%"></i></u><b>44%</b></td><td class="at">44</td></tr><tr class=""><td class="st">2차</td><td class="pr">$18.65</td><td class="dr">-5.4%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">47</td></tr><tr class=""><td class="st">3차</td><td class="pr">$17.58</td><td class="dr">-10.8%</td><td class="wt"><u><i style="width:22%"></i></u><b>22%</b></td><td class="at">52</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$15.47</b>
+    (-21.6%) · 회복 목표 $23.85</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>7곳</b>
+    <span class="mv">증가 5 · 감소 2</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 1곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$23.96</b>
+    <span class="mv">현재가 -17.7%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">WTW</div>
+      <div class="nm">Willis Towers Watson</div>
+      <div class="sec">금융</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$292.11</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−16.7%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-2.1%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="dn">-0.73%</dd></div>
+    <div><dt>RSI</dt><dd>28.3</dd></div>
+    <div><dt>ATR 이격</dt><dd>3.49배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.08</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>2.37</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.24</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.78</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.47</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$292.11</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">33</td></tr><tr class=""><td class="st">2차</td><td class="pr">$277.15</td><td class="dr">-5.1%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">36</td></tr><tr class=""><td class="st">3차</td><td class="pr">$262.18</td><td class="dr">-10.2%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">39</td></tr><tr class=""><td class="st">4차</td><td class="pr">$241.24</td><td class="dr">-17.4%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">45</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$212.29</b>
+    (-27.3%) · 회복 목표 $298.32</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>7곳</b>
+    <span class="mv">신규 1 · 증가 3 · 감소 3</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 1곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$264.36</b>
+    <span class="mv">현재가 +10.5%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">MRSH</div>
+      <div class="nm">Marsh McLennan</div>
+      <div class="sec">금융</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$169.03</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−17.0%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-4.0%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="dn">-0.46%</dd></div>
+    <div><dt>RSI</dt><dd>29.2</dd></div>
+    <div><dt>ATR 이격</dt><dd>3.25배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>1.87</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.91</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.17</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.79</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.49</b></span><span class="chip part" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0.66</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$169.03</td><td class="dr">현재</td><td class="wt"><u><i style="width:44%"></i></u><b>44%</b></td><td class="at">34</td></tr><tr class=""><td class="st">2차</td><td class="pr">$161.74</td><td class="dr">-4.3%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">37</td></tr><tr class=""><td class="st">3차</td><td class="pr">$154.45</td><td class="dr">-8.6%</td><td class="wt"><u><i style="width:22%"></i></u><b>22%</b></td><td class="at">40</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$135.92</b>
+    (-19.6%) · 회복 목표 $176.15</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-u"><b>⑤ 13F</b> <span>주요 기관 보유 목록에 없음</span></div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">BXP</div>
+      <div class="nm">BXP, Inc.</div>
+      <div class="sec">부동산</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$62.43</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−15.3%</dd></div>
+    <div><dt>200일선 대비</dt><dd>+0.2%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="dn">-1.09%</dd></div>
+    <div><dt>RSI</dt><dd>34.6</dd></div>
+    <div><dt>ATR 이격</dt><dd>2.43배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip part" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>1.12</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>2.46</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip part" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>0.77</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.31</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.4</b></span><span class="chip on" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>1.89</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$62.43</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">32</td></tr><tr class=""><td class="st">2차</td><td class="pr">$59.46</td><td class="dr">-4.8%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">34</td></tr><tr class=""><td class="st">3차</td><td class="pr">$56.49</td><td class="dr">-9.5%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">37</td></tr><tr class=""><td class="st">4차</td><td class="pr">$50.21</td><td class="dr">-19.6%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">45</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$44.18</b>
+    (-29.2%) · 회복 목표 $62.27</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>4곳</b>
+    <span class="mv">증가 2 · 감소 1</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">유지</span></li><li class="s-cut"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$58.72</b>
+    <span class="mv">현재가 +6.3%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">INVH</div>
+      <div class="nm">Invitation Homes</div>
+      <div class="sec">부동산</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$26.54</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−12.3%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-2.6%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+1.98%</dd></div>
+    <div><dt>RSI</dt><dd>20.3</dd></div>
+    <div><dt>ATR 이격</dt><dd>3.74배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>2.31</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.9</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.83</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.59</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.23</b></span><span class="chip off" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$26.54</td><td class="dr">현재</td><td class="wt"><u><i style="width:44%"></i></u><b>44%</b></td><td class="at">33</td></tr><tr class=""><td class="st">2차</td><td class="pr">$25.68</td><td class="dr">-3.2%</td><td class="wt"><u><i style="width:33%"></i></u><b>33%</b></td><td class="at">35</td></tr><tr class=""><td class="st">3차</td><td class="pr">$23.59</td><td class="dr">-11.1%</td><td class="wt"><u><i style="width:22%"></i></u><b>22%</b></td><td class="at">40</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$20.76</b>
+    (-21.8%) · 회복 목표 $27.24</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>8곳</b>
+    <span class="mv">신규 2 · 증가 4 · 감소 2</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">신규</span></li><li class="s-new"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">외 2곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$27.74</b>
+    <span class="mv">현재가 -4.3%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">ABT</div>
+      <div class="nm">Abbott Laboratories</div>
+      <div class="sec">헬스케어</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$100.98</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−23.2%</dd></div>
+    <div><dt>200일선 대비</dt><dd>-2.6%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="dn">-5.94%</dd></div>
+    <div><dt>RSI</dt><dd>33.7</dd></div>
+    <div><dt>ATR 이격</dt><dd>3.2배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip on" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>1.82</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.66</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip part" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>0.84</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1.3</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.82</b></span><span class="chip on" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>1.33</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$100.98</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">33</td></tr><tr class=""><td class="st">2차</td><td class="pr">$96.42</td><td class="dr">-4.5%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">36</td></tr><tr class=""><td class="st">3차</td><td class="pr">$92.58</td><td class="dr">-8.3%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">38</td></tr><tr class=""><td class="st">4차</td><td class="pr">$81.98</td><td class="dr">-18.8%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">46</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$72.14</b>
+    (-28.6%) · 회복 목표 $103.63</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>8곳</b>
+    <span class="mv">증가 5 · 감소 3</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 2곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$90.43</b>
+    <span class="mv">현재가 +11.7%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">MAR</div>
+      <div class="nm">Marriott International</div>
+      <div class="sec">경기소비재</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$358.57</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−10.7%</dd></div>
+    <div><dt>200일선 대비</dt><dd>+3.3%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+7.57%</dd></div>
+    <div><dt>RSI</dt><dd>29.2</dd></div>
+    <div><dt>ATR 이격</dt><dd>2.77배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip part" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>1.43</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>1.52</b></span><span class="chip off" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>0</b></span><span class="chip on" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>1.17</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>2</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.15</b></span><span class="chip on" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>1.48</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$358.57</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">31</td></tr><tr class=""><td class="st">2차</td><td class="pr">$347.03</td><td class="dr">-3.2%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">31</td></tr><tr class=""><td class="st">3차</td><td class="pr">$329.12</td><td class="dr">-8.2%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">34</td></tr><tr class=""><td class="st">4차</td><td class="pr">$312.56</td><td class="dr">-12.8%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">38</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$275.05</b>
+    (-23.3%) · 회복 목표 $347.03</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>7곳</b>
+    <span class="mv">신규 1 · 증가 2 · 감소 4</span></div>
+  <ul class="mgrs"><li class="s-new"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">신규</span></li><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Point72 <em>스티브 코헨</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Renaissance Tech <em>짐 사이먼스 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 1곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$368.00</b>
+    <span class="mv">현재가 -2.6%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t3">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">KLAC</div>
+      <div class="nm">KLA Corporation</div>
+      <div class="sec">정보기술</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>10</b><span>/17</span></div>
+      <div class="sc-t">참고</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:58.8%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$189.17</dd></div>
+    <div class="s2"><dt>52주 고점 대비</dt><dd class="dd">−37.2%</dd></div>
+    <div><dt>200일선 대비</dt><dd>+7.5%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+16.12%</dd></div>
+    <div><dt>RSI</dt><dd>33.5</dd></div>
+    <div><dt>ATR 이격</dt><dd>2.07배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip part" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>0.79</b></span><span class="chip part" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>0.38</b></span><span class="chip on" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>3</b></span><span class="chip part" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>0.85</b></span><span class="chip on" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>1</b></span><span class="chip on" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>1.58</b></span><span class="chip part" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0.07</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$189.17</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">38</td></tr><tr class=""><td class="st">2차</td><td class="pr">$175.96</td><td class="dr">-7.0%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">42</td></tr><tr class=""><td class="st">3차</td><td class="pr">$157.58</td><td class="dr">-16.7%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">50</td></tr><tr class=""><td class="st">4차</td><td class="pr">$137.93</td><td class="dr">-27.1%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">61</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$121.38</b>
+    (-35.8%) · 회복 목표 $210.96</div>
+</div>
+  <div class="fund none">④ 악재 스크리닝 미실행 <code>--deep</code></div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>7곳</b>
+    <span class="mv">증가 7</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">증가</span></li><li class="s-keep"><span class="mgr">외 1곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$204.52</b>
+    <span class="mv">현재가 -7.5%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article>
+<article class="card t2">
+  <header class="card-h">
+    <div class="id">
+      <div class="tk">JBL</div>
+      <div class="nm">Jabil</div>
+      <div class="sec">정보기술</div>
+    </div>
+    <div class="sc">
+      <div class="sc-n"><b>12</b><span>/17</span></div>
+      <div class="sc-t">관심</div>
+    </div>
+  </header>
+
+  <div class="bar"><i style="width:70.6%"></i></div>
+
+  <dl class="stats">
+    <div><dt>현재가</dt><dd>$318.93</dd></div>
+    <div class="s1"><dt>52주 고점 대비</dt><dd class="dd">−17.3%</dd></div>
+    <div><dt>200일선 대비</dt><dd>+6.3%</dd></div>
+    <div><dt>200일선 기울기</dt><dd class="up">+12.07%</dd></div>
+    <div><dt>RSI</dt><dd>38.0</dd></div>
+    <div><dt>ATR 이격</dt><dd>2.34배</dd></div>
+  </dl>
+
+  <div class="chips"><span class="chip part" title="그 종목 변동성 대비 과하게 빠졌나 (배점 3)">ATR 이격도<b>1.03</b></span><span class="chip on" title="투매 터진 뒤 거래량이 줄었나 (배점 3)">거래량 소진<b>2.63</b></span><span class="chip on" title="하락 힘이 빠지고 있나 (배점 3)">MACD 다이버전스<b>3</b></span><span class="chip part" title="2주간 매도 압력이 소진됐나 (배점 2)">RSI 과매도<b>0.52</b></span><span class="chip part" title="통계적으로 이상치 구간인가 (배점 2)">볼린저 이탈<b>0.74</b></span><span class="chip part" title="고점 대비 충분히 빠졌나 (배점 2)">52주 낙폭<b>0.5</b></span><span class="chip part" title="건전한 조정 범위인가 (배점 2)">피보나치 되돌림<b>0.99</b></span></div>
+  <div class="lad">
+  <div class="lad-h"><b>진입 사다리</b></div>
+  <table><thead><tr><th></th><th>가격</th><th>하락</th>
+    <th>비중</th><th>매력도</th></tr></thead>
+    <tbody><tr class="now"><td class="st">1차</td><td class="pr">$318.93</td><td class="dr">현재</td><td class="wt"><u><i style="width:40%"></i></u><b>40%</b></td><td class="at">33</td></tr><tr class=""><td class="st">2차</td><td class="pr">$308.15</td><td class="dr">-3.4%</td><td class="wt"><u><i style="width:30%"></i></u><b>30%</b></td><td class="at">33</td></tr><tr class=""><td class="st">3차</td><td class="pr">$294.10</td><td class="dr">-7.8%</td><td class="wt"><u><i style="width:20%"></i></u><b>20%</b></td><td class="at">34</td></tr><tr class=""><td class="st">4차</td><td class="pr">$269.26</td><td class="dr">-15.6%</td><td class="wt"><u><i style="width:10%"></i></u><b>10%</b></td><td class="at">39</td></tr></tbody></table>
+  <div class="inval">폐기선 <b>$236.95</b>
+    (-25.7%) · 회복 목표 $300.04</div>
+</div>
+  <div class="fund g-c">
+  <div class="fin">
+  <div class="fin-h"><b>재무 점수</b>
+    <span class="fin-n">49<small>/100 · D</small></span></div>
+  <div class="fin-bar"><i style="width:49%"></i></div>
+  <div class="fin-items"><div class="fi"><span>ROE</span><u><i style="width:100%"></i></u></div><div class="fi"><span>영업이익률</span><u><i style="width:26%"></i></u></div><div class="fi"><span>현금흐름</span><u><i style="width:100%"></i></u></div><div class="fi"><span>부채비율</span><u><i style="width:0%"></i></u></div><div class="fi"><span>유동비율</span><u><i style="width:15%"></i></u></div><div class="fi"><span>매출성장률</span><u><i style="width:87%"></i></u></div><div class="fi"><span>선행 PER</span><u><i style="width:75%"></i></u></div><div class="fi"><span>PBR</span><u><i style="width:0%"></i></u></div></div>
+</div>
+  <div class="fund-h"><b>④ 악재 스크리닝</b>
+    <span class="gr">C · 차단</span></div>
+  <span class="blk">실적 블랙아웃</span><ul><li>재무 점수 49점 (D등급) · 강점 현금흐름, ROE · 약점 부채비율, PBR</li><li>실적발표 1일 후 발표 — 컨센서스 미반영 구간</li><li>EPS 추정치 +1.0% 유지 — 밸류에이션만 조정</li><li>매출총이익률 -0.0%p</li><li>최근 30일 상향 1 / 하향 0</li></ul>
+</div>
+  <div class="f13 z-ok">
+  <div class="f13-h"><b>⑤ 13F 기관 보유</b><span class="zn">적정</span></div>
+  <div class="f13-r"><span>보유 기관</span><b>7곳</b>
+    <span class="mv">증가 3 · 감소 4</span></div>
+  <ul class="mgrs"><li class="s-add"><span class="mgr">Bridgewater <em>레이 달리오 창업</em></span><span class="sty y-macro">매크로</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">AQR <em>클리프 애스네스</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-add"><span class="mgr">D.E. Shaw <em>데이비드 쇼 창업</em></span><span class="sty y-quant">퀀트</span><span class="act">증가</span></li><li class="s-cut"><span class="mgr">Two Sigma <em>존 오버덱·데이비드 시겔</em></span><span class="sty y-quant">퀀트</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Citadel <em>켄 그리핀</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li><li class="s-cut"><span class="mgr">Millennium <em>이즈리얼 잉글랜더</em></span><span class="sty y-multi">멀티전략</span><span class="act">감소</span></li><li class="s-keep"><span class="mgr">외 1곳</span></li></ul>
+  <div class="f13-r"><span>추정 평단</span>
+    <b>$349.58</b>
+    <span class="mv">현재가 -8.8%</span></div>
+  <div class="f13-note">2026-06-30 분기 보유 신고 ·
+    91일 지연 · 평단은 분기 거래량가중평균가로 <b>추정</b>한 값<br>
+    <b>보유 신고일 뿐 해당 기관의 추천·의견이 아닙니다.</b>
+    진입 시점 판단에만 쓰고, 이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.</div>
+</div>
+</article></div>
+
+  <footer class="foot">
+    <b>읽는 법</b> — 차트 점수(17점 만점)는 <b>언제</b> 사느냐를,
+    재무 점수(100점)는 <b>무엇을</b> 사느냐를 말합니다. 순위는 재무 점수 순이고,
+    차트 점수는 같은 등급 안에서의 보조 기준입니다.<br>
+    <b>진입 사다리</b> — 손절선이 없는 전략에서 진입 가격은 유일한 방어선입니다.
+    그래서 한 점이 아니라 구간으로 나눠 삽니다. 매력도는 회복 목표가까지의
+    기대수익에 차트 타이밍과 재무 품질을 더한 값입니다. 하락 채널로 판정된 종목은
+    차단하지 않고 1차 비중을 줄이는 대신 아래 칸을 두껍게 잡습니다.<br>
+    <b>13F의 한계</b> — 기관 공시는 최대 45일 늦고 롱 포지션만 나오며 평단은
+    공시되지 않습니다(분기 거래량가중평균가로 추정). 그래서 진입 판단에만 쓰고,
+    이미 보유한 종목을 계속 들고 있을 근거로는 쓰지 않습니다.<br>
+    이 리포트는 후보를 추린 것이지 매수 신호가 아닙니다.
+  </footer>
+</div></body></html>
