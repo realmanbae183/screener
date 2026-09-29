@@ -1,0 +1,46 @@
+name: daily screener
+
+on:
+  schedule:
+    - cron: "0 22 * * 0-4"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-screener
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install yfinance pandas numpy lxml
+
+      - uses: actions/cache@v4
+        with:
+          path: data
+          key: screener-data-${{ github.run_id }}
+          restore-keys: screener-data-
+
+      - env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SEC_CONTACT: ${{ secrets.SEC_CONTACT }}
+          REPORT_URL: ${{ vars.REPORT_URL }}
+        run: python run.py --all --no-open --report docs/index.html
+
+      - run: |
+          git config user.name "screener-bot"
+          git config user.email "screener-bot@users.noreply.github.com"
+          git add -f docs/index.html candidates.csv data/alert_state.json || true
+          git diff --staged --quiet || git commit -m "screening $(date -u +%Y-%m-%d)"
+          git push || true
