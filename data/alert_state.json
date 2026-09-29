@@ -3,7 +3,7 @@
   "GNRC": {
    "price": 205.21,
    "score": 13.4,
-   "fin_score": 81.8,
+   "fin_score": 81.3,
    "grade": "A",
    "rung_prices": [
     205.21,
@@ -17,7 +17,7 @@
   "ON": {
    "price": 75.65,
    "score": 12.0,
-   "fin_score": 79.9,
+   "fin_score": 79.8,
    "grade": "A",
    "rung_prices": [
     75.65,
@@ -31,7 +31,7 @@
   "CIEN": {
    "price": 344.19,
    "score": 13.0,
-   "fin_score": 77.0,
+   "fin_score": 76.6,
    "grade": "A",
    "rung_prices": [
     344.19,
@@ -45,7 +45,7 @@
   "ROP": {
    "price": 354.0,
    "score": 11.9,
-   "fin_score": 73.2,
+   "fin_score": 73.4,
    "grade": "A",
    "rung_prices": [
     354.0,
@@ -58,7 +58,7 @@
   "HRL": {
    "price": 19.97,
    "score": 11.3,
-   "fin_score": 70.7,
+   "fin_score": 70.8,
    "grade": "A",
    "rung_prices": [
     19.97,
@@ -71,7 +71,7 @@
   "ATO": {
    "price": 157.05,
    "score": 12.7,
-   "fin_score": 56.8,
+   "fin_score": 56.7,
    "grade": "A",
    "rung_prices": [
     157.05,
@@ -124,7 +124,7 @@
   "PTC": {
    "price": 139.69,
    "score": 13.2,
-   "fin_score": 66.5,
+   "fin_score": 66.7,
    "grade": "B",
    "rung_prices": [
     139.69,
@@ -138,7 +138,7 @@
   "CASY": {
    "price": 606.24,
    "score": 11.6,
-   "fin_score": 63.7,
+   "fin_score": 63.9,
    "grade": "B",
    "rung_prices": [
     606.24,
@@ -152,7 +152,7 @@
   "EIX": {
    "price": 51.47,
    "score": 11.8,
-   "fin_score": 58.1,
+   "fin_score": 58.0,
    "grade": "B",
    "rung_prices": [
     51.47,
@@ -178,7 +178,7 @@
   "ARES": {
    "price": 118.34,
    "score": 11.6,
-   "fin_score": 48.6,
+   "fin_score": 48.5,
    "grade": "B",
    "rung_prices": [
     118.34,
@@ -458,5 +458,5 @@
    "reached": []
   }
  },
- "updated": "2026-09-29T03:22:09"
+ "updated": "2026-09-29T22:07:02"
 }
