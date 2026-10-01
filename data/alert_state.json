@@ -3,7 +3,7 @@
   "GNRC": {
    "price": 206.95,
    "score": 13.5,
-   "fin_score": 81.7,
+   "fin_score": 81.6,
    "grade": "A",
    "rung_prices": [
     206.95,
@@ -17,7 +17,7 @@
   "ON": {
    "price": 76.87,
    "score": 11.6,
-   "fin_score": 79.7,
+   "fin_score": 79.1,
    "grade": "A",
    "rung_prices": [
     76.87,
@@ -31,7 +31,7 @@
   "CIEN": {
    "price": 351.82,
    "score": 12.9,
-   "fin_score": 76.7,
+   "fin_score": 75.9,
    "grade": "A",
    "rung_prices": [
     351.82,
@@ -44,7 +44,7 @@
   "ROP": {
    "price": 349.41,
    "score": 11.9,
-   "fin_score": 73.4,
+   "fin_score": 73.0,
    "grade": "A",
    "rung_prices": [
     349.41,
@@ -57,7 +57,7 @@
   "TPR": {
    "price": 115.04,
    "score": 13.6,
-   "fin_score": 67.8,
+   "fin_score": 67.6,
    "grade": "A",
    "rung_prices": [
     115.04,
@@ -70,7 +70,7 @@
   "PAYX": {
    "price": 98.5,
    "score": 11.7,
-   "fin_score": 66.8,
+   "fin_score": 66.7,
    "grade": "A",
    "rung_prices": [
     98.5,
@@ -124,7 +124,7 @@
   "DAL": {
    "price": 83.46,
    "score": 12.1,
-   "fin_score": 70.1,
+   "fin_score": 70.0,
    "grade": "B",
    "rung_prices": [
     83.46,
@@ -138,7 +138,7 @@
   "PTC": {
    "price": 140.3,
    "score": 13.3,
-   "fin_score": 66.5,
+   "fin_score": 65.8,
    "grade": "B",
    "rung_prices": [
     140.3,
@@ -152,7 +152,7 @@
   "CASY": {
    "price": 608.46,
    "score": 12.2,
-   "fin_score": 63.6,
+   "fin_score": 63.2,
    "grade": "B",
    "rung_prices": [
     608.46,
@@ -472,5 +472,5 @@
    "reached": []
   }
  },
- "updated": "2026-09-30T22:09:11"
+ "updated": "2026-10-01T22:07:07"
 }
