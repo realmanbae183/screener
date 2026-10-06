@@ -3,7 +3,7 @@
   "GNRC": {
    "price": 215.2,
    "score": 13.2,
-   "fin_score": 81.2,
+   "fin_score": 80.7,
    "grade": "A",
    "rung_prices": [
     215.2,
@@ -16,7 +16,7 @@
   "ON": {
    "price": 85.93,
    "score": 11.5,
-   "fin_score": 78.0,
+   "fin_score": 77.9,
    "grade": "A",
    "rung_prices": [
     85.93,
@@ -44,7 +44,7 @@
   "HRL": {
    "price": 20.08,
    "score": 13.3,
-   "fin_score": 70.7,
+   "fin_score": 70.8,
    "grade": "A",
    "rung_prices": [
     20.08,
@@ -67,23 +67,10 @@
    "invalidation": 90.77,
    "reached": []
   },
-  "ALB": {
-   "price": 104.37,
-   "score": 14.3,
-   "fin_score": 88.5,
-   "grade": "B",
-   "rung_prices": [
-    104.37,
-    95.64,
-    86.91
-   ],
-   "invalidation": 76.48,
-   "reached": []
-  },
   "PYPL": {
    "price": 54.41,
    "score": 11.6,
-   "fin_score": 78.3,
+   "fin_score": 78.2,
    "grade": "B",
    "rung_prices": [
     54.41,
@@ -110,7 +97,7 @@
   "ABNB": {
    "price": 164.07,
    "score": 12.1,
-   "fin_score": 77.4,
+   "fin_score": 77.6,
    "grade": "B",
    "rung_prices": [
     164.07,
@@ -152,7 +139,7 @@
   "CASY": {
    "price": 617.33,
    "score": 12.0,
-   "fin_score": 63.3,
+   "fin_score": 63.2,
    "grade": "B",
    "rung_prices": [
     617.33,
@@ -535,6 +522,19 @@
    "invalidation": 257.29,
    "reached": []
   },
+  "ALB": {
+   "price": 104.37,
+   "score": 14.3,
+   "fin_score": 88.5,
+   "grade": "C",
+   "rung_prices": [
+    104.37,
+    95.64,
+    86.91
+   ],
+   "invalidation": 76.48,
+   "reached": []
+  },
   "DAL": {
    "price": 83.08,
    "score": 11.9,
@@ -550,5 +550,5 @@
    "reached": []
   }
  },
- "updated": "2026-10-05T22:11:07"
+ "updated": "2026-10-06T22:06:52"
 }
