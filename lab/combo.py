@@ -30,7 +30,7 @@ SIDE_COST = mnq.SIDE_COST
 D = 23                    # 나스닥 선물은 하루 약 23시간 거래 → 1시간봉 23개 ≈ 하루
 HOLDS = [6, 23, 115]      # 보유: 6시간 / 하루 / 5거래일
 STOPS = [None, 1.5]       # 손절 없음 / ATR(14) × 1.5 × √보유시간 (오래 들수록 넓게)
-N_RANDOM = int(os.getenv("LAB_RANDOM", "1000"))
+N_RANDOM = int(os.getenv("LAB_RANDOM", "3000"))
 SEED = 7
 
 
@@ -196,7 +196,7 @@ def main():
         e[rng.choice(len(df) - 1, size=min(k, len(df) - 1), replace=False)] = True
         pnl, tr = run(df_np, e, d, ref["보유"], 1.5 if ref["손절"] else None)
         A, B, WA, WB = evaluate(pnl, tr, df.index, cut)
-        rand.append({"방향": ref["방향"], "앞": A, "뒤": B, "WA": WA, "WB": WB, "fs": front_score(A, WA)})
+        rand.append({"방향": ref["방향"], "보유": ref["보유"], "앞": A, "뒤": B, "WA": WA, "WB": WB, "fs": front_score(A, WA)})
 
     # 3) 이웃 확인: 같은 조합·방향의 6가지 청산 중 뒤 기간 플러스 개수
     nb = {}
@@ -231,13 +231,16 @@ def report(rows, rand, df, cut) -> str:
 
     # 운의 선: 무작위 진입의 뒤 기간 수익 분포 (방향별)
     luck = {s: back_ret([r for r in rand if r["방향"] == s]) for s in ("매수", "매도")}
-    line = {s: pct(v, 95) for s, v in luck.items()}
+    # 운의 선은 같은 방향·같은 보유 기간의 무작위끼리만 비교 (5일 보유 무작위와 6시간 단타를 섞지 않음)
+    luck_b = {(s, hd): back_ret([r for r in rand if r["방향"] == s and r["보유"] == hd]) for s in ("매수", "매도") for hd in HOLDS}
+    line = {k: pct(v, 95) for k, v in luck_b.items() if len(v) >= 30}
 
     def verdict(r):
         bad = []
         if r["뒤"]["ret"] <= 0:
             bad.append("뒤 손실")
-        if line.get(r["방향"]) is not None and r["뒤"]["ret"] <= line[r["방향"]]:
+        lk = line.get((r["방향"], r["보유"]))
+        if lk is None or r["뒤"]["ret"] <= lk:
             bad.append("운의 선 못 넘음")
         if int(r["이웃"].split("/")[0]) < 4:
             bad.append("이웃 약함")
@@ -254,7 +257,11 @@ def report(rows, rand, df, cut) -> str:
     for s in ("매수", "매도"):
         v = luck[s]
         if v:
-            L.append(f"- {s}: 중간 {pct(v, 50)}% · 상위 5% 선(운의 선) {pct(v, 95)}% · 최고 {round(max(v), 1)}%  ({len(v)}개)")
+            L.append(f"- {s} 전체: 중간 {pct(v, 50)}% · 최고 {round(max(v), 1)}%  ({len(v)}개)")
+        for hd in HOLDS:
+            vb = luck_b[(s, hd)]
+            if vb:
+                L.append(f"  - {s} · {hd}시간 보유: 중간 {pct(vb, 50)}% · 상위 5% 선(운의 선) {pct(vb, 95)}%  ({len(vb)}개)")
     if ranked and rnd:
         a = back_ret(ranked[:top_n])
         b = back_ret(rnd[:top_n])
