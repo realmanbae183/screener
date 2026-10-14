@@ -1,0 +1,37 @@
+# MNQ(마이크로 나스닥) 대회 전략 연습장 — 손으로 실행. 결과는 lab/results/ 에 저장된다.
+name: mnq lab
+
+on:
+  workflow_dispatch:
+    inputs:
+      tf:
+        description: "봉 단위 (1h = 1시간봉 약 2년, 15m = 15분봉 약 60일)"
+        type: choice
+        options: ["1h", "15m"]
+        default: "1h"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mnq-lab
+  cancel-in-progress: false
+
+jobs:
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q yfinance pandas numpy
+      - name: 전략 돌려보기
+        run: python lab/mnq.py ${{ inputs.tf }}
+      - name: 결과 저장
+        run: |
+          git config user.name "mnq-lab-bot"; git config user.email "actions@users.noreply.github.com"
+          git add lab/results
+          git commit -q -m "lab: ${{ inputs.tf }} $(TZ=Asia/Seoul date +'%F %H:%M')" || true
+          for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 5; done
