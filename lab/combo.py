@@ -207,6 +207,26 @@ def main():
         v = nb[(r["조합"], r["방향"])]
         r["이웃"] = f"{sum(v)}/{len(v)}"
 
+    # 4) 상위 40개 정밀 시험: 뒤 기간에 매매 횟수·방향·보유·손절까지 똑같은 무작위 200개와 비교
+    ci = int(np.searchsorted(df.index, cut))
+    m = len(df) - 1 - ci
+    top = sorted([r for r in rows if r["fs"] > -1e8], key=lambda r: r["fs"], reverse=True)[:40]
+    for r in top:
+        d = 1 if r["방향"] == "매수" else -1
+        hold = r["보유"]
+        k = min(r["뒤"]["n"], max(1, m // (hold + 1) - 1))
+        if k < 5:
+            continue
+        better = 0
+        for _ in range(200):
+            starts = np.sort(rng.choice(m - k * (hold + 1), k, replace=False)) + np.arange(k) * (hold + 1) + ci
+            e = np.zeros(len(df), bool)
+            e[starts - 1] = True                       # 봉 마감 신호 → 다음 봉 진입
+            pnl, tr = run(df_np, e, d, hold, 1.5 if r["손절"] else None)
+            pb = pnl[ci:].sum() / mnq.CAPITAL * 100
+            better += pb >= r["뒤"]["ret"]
+        r["p"] = better / 200
+
     md = report(rows, rand, df, cut)
     tag = "1h" if SIDE_COST == 8.0 else f"1h_cost{SIDE_COST:g}"
     with open(os.path.join(OUT, f"combo_{tag}.md"), "w", encoding="utf-8") as f:
@@ -239,9 +259,13 @@ def report(rows, rand, df, cut) -> str:
         bad = []
         if r["뒤"]["ret"] <= 0:
             bad.append("뒤 손실")
-        lk = line.get((r["방향"], r["보유"]))
-        if lk is None or r["뒤"]["ret"] <= lk:
-            bad.append("운의 선 못 넘음")
+        if "p" in r:
+            if r["p"] > 0.05:
+                bad.append(f"운으로도 {round(r['p'] * 100)}% 확률")
+        else:
+            lk = line.get((r["방향"], r["보유"]))
+            if lk is None or r["뒤"]["ret"] <= lk:
+                bad.append("운의 선 못 넘음")
         if int(r["이웃"].split("/")[0]) < 4:
             bad.append("이웃 약함")
         if r["뒤"]["tpw"] < 2:
@@ -268,7 +292,7 @@ def report(rows, rand, df, cut) -> str:
         L += ["", f"- 앞 기간 1~{top_n}등의 뒤 기간 수익 중간값: 진짜 조합 {pct(a, 50)}% / 무작위 {pct(b, 50)}%",
               "  (진짜가 무작위보다 확실히 높아야 '조합 고르기'에 실력이 있다는 뜻. 이게 안 되면 아래 개별 통과도 운일 가능성이 큼)"]
 
-    L += ["", f"## 앞 기간 상위 40개 (판정: 뒤 플러스 + 운의 선 넘음 + 이웃 4/6 이상 + 주 2회)", "",
+    L += ["", f"## 앞 기간 상위 40개 (판정: 뒤 플러스 + 매매 횟수까지 같은 무작위 200개 중 상위 5% 안 + 이웃 4/6 이상 + 주 2회)", "",
           "| 순위 | 조합 | 방향 | 보유 | 손절 | 앞 수익%/MDD% | 뒤 수익%/MDD% | 뒤 4주 중앙% | 뒤 4주 플러스 | 주당 매매 | 이웃 | 판정 |",
           "|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for i, r in enumerate(ranked[:40], 1):
