@@ -9,6 +9,11 @@ on:
         type: choice
         options: ["1h", "15m"]
         default: "1h"
+      script:
+        description: "mnq = 기본 전략 5종 / combo = 지표 10개 조합 + 무작위 비교"
+        type: choice
+        options: ["mnq", "combo"]
+        default: "mnq"
       cost:
         description: "편도 비용 $ (수수료 7.5면 8, 수수료 1이면 1.5)"
         type: string
@@ -34,7 +39,7 @@ jobs:
       - name: 전략 돌려보기
         env:
           LAB_COST: ${{ inputs.cost }}
-        run: python lab/mnq.py ${{ inputs.tf }}
+        run: python lab/${{ inputs.script }}.py ${{ inputs.tf }}
       - name: 결과 저장
         run: |
           git config user.name "mnq-lab-bot"; git config user.email "actions@users.noreply.github.com"
