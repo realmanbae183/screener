@@ -10,9 +10,9 @@ on:
         options: ["1h", "15m"]
         default: "1h"
       script:
-        description: "mnq = 기본 전략 5종 / combo = 지표 10개 조합 + 무작위 비교"
+        description: "mnq = 기본 전략 5종 / combo = 지표 10개 조합 / exits = 사고파는 규칙 전수 시험"
         type: choice
-        options: ["mnq", "combo"]
+        options: ["mnq", "combo", "exits"]
         default: "mnq"
       cost:
         description: "편도 비용 $ (수수료 7.5면 8, 수수료 1이면 1.5)"
@@ -29,13 +29,13 @@ concurrency:
 jobs:
   lab:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -q yfinance pandas numpy
+      - run: pip install -q yfinance pandas numpy numba
       - name: 전략 돌려보기
         env:
           LAB_COST: ${{ inputs.cost }}
