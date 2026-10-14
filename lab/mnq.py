@@ -29,7 +29,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
 OUT = os.path.join(HERE, "results")
 PT = 2.0            # MNQ 1포인트 = $2
-SIDE_COST = 8.0     # 편도 수수료 $7.5 + 미끄러짐 $0.5
+SIDE_COST = float(os.getenv("LAB_COST", "8.0"))   # 편도 비용 = 수수료 + 미끄러짐 $0.5 (수수료 $7.5면 8, $1이면 1.5)
 CAPITAL = float(os.getenv("LAB_CAPITAL", "10000"))   # 모의계좌 금액 (모르면 $1만으로 가정, 비율은 계약 수로 조절)
 
 
@@ -255,7 +255,7 @@ def report(rows: list[dict], df: pd.DataFrame, tag: str) -> str:
     cut = df.index[int(len(df) * 2 / 3)]
     lines = [f"# MNQ 연습 결과 · {tag}", "",
              f"- 데이터: NQ=F {df.index[0]:%Y-%m-%d} ~ {df.index[-1]:%Y-%m-%d} ({len(df):,}봉) · 앞/뒤 나눈 날 {cut:%Y-%m-%d}",
-             f"- 1계약 · 계좌 ${CAPITAL:,.0f} 가정 · 편도 비용 ${SIDE_COST} (수수료 7.5 + 미끄러짐 0.5)",
+             f"- 1계약 · 계좌 ${CAPITAL:,.0f} 가정 · 편도 비용 ${SIDE_COST} (수수료 + 미끄러짐 0.5)",
              "- 4주 성적 = 뒤 기간을 4주씩 잘라 1주씩 밀며 본 값 (중앙값). 주 2회 미만 매매가 한 번이라도 있으면 탈락 처리", "",
              "| 순위 | 전략 | 설정 | 앞 수익%/MDD% | 뒤 수익%/MDD% | 4주 수익% (중앙) | 4주 플러스 비율 | 4주 최악% | 4주 MDD% (중앙) | 주당 매매 |",
              "|---|---|---|---|---|---|---|---|---|---|"]
@@ -280,6 +280,8 @@ def main():
     tf = sys.argv[1] if len(sys.argv) > 1 else "1h"
     df = load(tf)
     rows = run_grid(df)
+    if SIDE_COST != 8.0:
+        tf = f"{tf}_cost{SIDE_COST:g}"
     md = report(rows, df, tf)
     with open(os.path.join(OUT, f"grid_{tf}.md"), "w", encoding="utf-8") as f:
         f.write(md)

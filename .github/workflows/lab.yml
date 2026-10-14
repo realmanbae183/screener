@@ -9,6 +9,10 @@ on:
         type: choice
         options: ["1h", "15m"]
         default: "1h"
+      cost:
+        description: "편도 비용 $ (수수료 7.5면 8, 수수료 1이면 1.5)"
+        type: string
+        default: "8"
 
 permissions:
   contents: write
@@ -28,6 +32,8 @@ jobs:
           python-version: "3.12"
       - run: pip install -q yfinance pandas numpy
       - name: 전략 돌려보기
+        env:
+          LAB_COST: ${{ inputs.cost }}
         run: python lab/mnq.py ${{ inputs.tf }}
       - name: 결과 저장
         run: |
