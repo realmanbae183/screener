@@ -214,7 +214,7 @@ def main():
     for r in top:
         d = 1 if r["방향"] == "매수" else -1
         hold = r["보유"]
-        k = min(r["뒤"]["n"], max(1, m // (hold + 1) - 1))
+        k = min(r["뒤"]["n"], m // (hold + 2))           # 겹치지 않게 넣을 자리가 남도록
         if k < 5:
             continue
         better = 0
