@@ -1,738 +1,711 @@
 {
  "tickers": {
   "KLAC": {
-   "price": 165.74,
-   "score": 12.6,
+   "price": 166.4,
+   "score": 12.5,
    "fin_score": 80.8,
    "grade": "A",
    "rung_prices": [
-    165.74,
-    149.46,
-    137.93
+    166.4,
+    150.24,
+    134.08
    ],
-   "invalidation": 121.38,
+   "invalidation": 117.99,
    "reached": []
   },
   "VZ": {
-   "price": 44.79,
-   "score": 14.3,
+   "price": 44.15,
+   "score": 13.9,
    "fin_score": 58.1,
    "grade": "A",
    "rung_prices": [
-    44.79,
-    43.75,
-    41.29
+    44.15,
+    41.93,
+    39.71
    ],
-   "invalidation": 36.34,
+   "invalidation": 34.94,
    "reached": []
   },
   "SBUX": {
-   "price": 97.52,
-   "score": 12.6,
-   "fin_score": 50.8,
+   "price": 97.87,
+   "score": 12.7,
+   "fin_score": 50.7,
    "grade": "A",
    "rung_prices": [
-    97.52,
+    97.87,
     94.55,
-    87.84
+    88.56
    ],
-   "invalidation": 77.3,
+   "invalidation": 77.93,
    "reached": []
   },
   "HIG": {
-   "price": 135.12,
-   "score": 12.7,
+   "price": 134.33,
+   "score": 12.9,
    "fin_score": 89.8,
    "grade": "B",
    "rung_prices": [
-    135.12,
+    134.33,
     131.03,
-    125.54
+    125.01
    ],
-   "invalidation": 110.48,
+   "invalidation": 110.01,
    "reached": []
   },
   "ALB": {
-   "price": 95.48,
-   "score": 14.4,
+   "price": 94.64,
+   "score": 14.3,
    "fin_score": 88.8,
    "grade": "B",
    "rung_prices": [
-    95.48,
-    87.51,
-    79.54
+    94.64,
+    86.91,
+    79.17
    ],
-   "invalidation": 70.0,
+   "invalidation": 69.67,
    "reached": []
   },
   "BKNG": {
-   "price": 163.45,
+   "price": 162.6,
    "score": 13.0,
-   "fin_score": 78.2,
+   "fin_score": 78.3,
    "grade": "B",
    "rung_prices": [
-    163.45,
+    162.6,
     153.37,
-    141.47
+    141.02
    ],
-   "invalidation": 124.49,
+   "invalidation": 124.1,
    "reached": []
   },
   "CTVA": {
-   "price": 12.88,
+   "price": 12.65,
    "score": 13.0,
    "fin_score": 77.2,
    "grade": "B",
    "rung_prices": [
-    12.88,
+    12.65,
     11.92,
-    6.01
+    6.2
    ],
-   "invalidation": 5.29,
+   "invalidation": 5.46,
    "reached": []
   },
   "AFL": {
-   "price": 119.97,
-   "score": 13.7,
-   "fin_score": 71.0,
+   "price": 118.67,
+   "score": 13.1,
+   "fin_score": 71.1,
    "grade": "B",
    "rung_prices": [
-    119.97,
-    117.95,
-    112.05,
-    107.07
+    118.67,
+    114.97,
+    110.94
    ],
-   "invalidation": 94.22,
+   "invalidation": 97.63,
    "reached": []
   },
   "PAYX": {
-   "price": 111.63,
-   "score": 13.2,
+   "price": 110.75,
+   "score": 13.1,
    "fin_score": 66.1,
    "grade": "B",
    "rung_prices": [
-    111.63,
-    109.52,
-    104.67,
+    110.75,
+    105.55,
+    100.34,
     83.61
    ],
    "invalidation": 73.58,
    "reached": []
   },
   "GEN": {
-   "price": 24.16,
-   "score": 13.0,
-   "fin_score": 55.9,
+   "price": 23.64,
+   "score": 12.8,
+   "fin_score": 56.1,
    "grade": "B",
    "rung_prices": [
-    24.16,
+    23.64,
     23.11,
-    22.17,
-    20.17
+    21.7,
+    19.76
    ],
-   "invalidation": 17.75,
+   "invalidation": 17.39,
    "reached": []
   },
   "MGM": {
-   "price": 28.6,
+   "price": 28.47,
    "score": 14.2,
    "fin_score": 54.9,
    "grade": "B",
    "rung_prices": [
-    28.6,
-    26.53,
-    24.46
+    28.47,
+    26.46,
+    24.44
    ],
-   "invalidation": 21.52,
-   "reached": []
-  },
-  "KHC": {
-   "price": 23.68,
-   "score": 12.5,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    23.68,
-    23.23,
-    21.35
-   ],
-   "invalidation": 18.79,
+   "invalidation": 21.51,
    "reached": []
   },
   "GE": {
-   "price": 313.83,
+   "price": 311.28,
    "score": 12.5,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    313.83,
-    298.79,
-    283.74,
-    272.91
+    311.28,
+    296.64,
+    282.0
    ],
-   "invalidation": 240.16,
+   "invalidation": 248.16,
    "reached": []
   },
-  "HRL": {
-   "price": 20.4,
+  "IP": {
+   "price": 33.75,
    "score": 12.2,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    20.4,
-    19.48,
-    18.56
+    33.75,
+    32.65,
+    29.39
    ],
-   "invalidation": 16.33,
+   "invalidation": 25.86,
    "reached": []
   },
-  "ALL": {
-   "price": 247.88,
-   "score": 12.1,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    247.88,
-    241.77,
-    233.01,
-    224.43
-   ],
-   "invalidation": 197.5,
-   "reached": []
-  },
-  "NI": {
-   "price": 42.68,
+  "BE": {
+   "price": 226.22,
    "score": 12.0,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    42.68,
-    41.19,
-    39.71
+    226.22,
+    216.99,
+    202.72,
+    187.67
    ],
-   "invalidation": 34.94,
+   "invalidation": 165.15,
    "reached": []
   },
-  "BE": {
-   "price": 221.31,
+  "ALL": {
+   "price": 246.85,
+   "score": 12.0,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    246.85,
+    241.77,
+    233.01,
+    224.64
+   ],
+   "invalidation": 197.68,
+   "reached": []
+  },
+  "KHC": {
+   "price": 23.17,
    "score": 11.9,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    221.31,
-    216.3,
-    202.72,
-    181.67
+    23.17,
+    22.01,
+    21.16
    ],
-   "invalidation": 159.87,
+   "invalidation": 18.62,
    "reached": []
   },
   "ON": {
-   "price": 72.02,
+   "price": 73.12,
    "score": 11.8,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    72.02,
-    65.03,
-    58.03,
-    55.66
+    73.12,
+    66.21,
+    61.92,
+    59.31
    ],
-   "invalidation": 48.98,
-   "reached": []
-  },
-  "SBAC": {
-   "price": 187.06,
-   "score": 11.8,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    187.06,
-    182.03,
-    175.64,
-    164.22
-   ],
-   "invalidation": 144.51,
-   "reached": []
-  },
-  "ABNB": {
-   "price": 173.7,
-   "score": 11.7,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    173.7,
-    170.04,
-    163.73,
-    153.75
-   ],
-   "invalidation": 135.3,
+   "invalidation": 52.19,
    "reached": []
   },
   "CASY": {
-   "price": 689.22,
+   "price": 693.73,
    "score": 11.7,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    689.22,
+    693.73,
     655.61,
-    609.9,
+    616.17,
     584.83
    ],
    "invalidation": 514.65,
    "reached": []
   },
   "LIN": {
-   "price": 498.43,
+   "price": 503.44,
    "score": 11.6,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    498.43,
+    503.44,
     490.87,
-    467.09
+    472.32
    ],
-   "invalidation": 411.04,
+   "invalidation": 415.64,
    "reached": []
   },
-  "WEC": {
-   "price": 108.71,
+  "NI": {
+   "price": 41.95,
    "score": 11.6,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    108.71,
-    105.11,
-    100.78
+    41.95,
+    41.09,
+    39.0
    ],
-   "invalidation": 88.69,
+   "invalidation": 34.32,
    "reached": []
   },
-  "PEG": {
-   "price": 71.49,
+  "CHRW": {
+   "price": 138.85,
    "score": 11.5,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    71.49,
-    68.81,
-    66.13
+    138.85,
+    135.05,
+    127.73,
+    116.61
    ],
-   "invalidation": 58.19,
+   "invalidation": 102.62,
    "reached": []
   },
-  "SPG": {
-   "price": 205.44,
+  "SBAC": {
+   "price": 183.09,
    "score": 11.4,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    205.44,
-    201.09,
-    192.73,
-    178.46
+    183.09,
+    171.71,
+    160.33
    ],
-   "invalidation": 157.04,
+   "invalidation": 141.09,
    "reached": []
   },
-  "EFX": {
-   "price": 161.25,
-   "score": 11.4,
+  "ABNB": {
+   "price": 175.46,
+   "score": 11.3,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    161.25,
-    157.34,
-    150.91,
-    140.57
+    175.46,
+    170.04,
+    158.34,
+    145.2
    ],
-   "invalidation": 123.7,
+   "invalidation": 127.78,
    "reached": []
   },
   "STX": {
-   "price": 639.01,
-   "score": 11.4,
+   "price": 660.81,
+   "score": 11.2,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    639.01,
-    535.58,
-    432.15,
-    361.88
+    660.81,
+    559.53,
+    458.24,
+    391.17
    ],
-   "invalidation": 318.45,
+   "invalidation": 344.23,
+   "reached": []
+  },
+  "WRB": {
+   "price": 74.08,
+   "score": 11.2,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    74.08,
+    71.44,
+    68.8,
+    62.88
+   ],
+   "invalidation": 55.33,
    "reached": []
   },
   "ABT": {
-   "price": 104.89,
-   "score": 11.2,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    104.89,
-    102.05,
-    95.57,
-    91.87
-   ],
-   "invalidation": 80.85,
-   "reached": []
-  },
-  "WTW": {
-   "price": 315.49,
-   "score": 11.2,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    315.49,
-    301.51,
-    286.29,
-    241.24
-   ],
-   "invalidation": 212.29,
-   "reached": []
-  },
-  "DTE": {
-   "price": 129.73,
+   "price": 104.06,
    "score": 11.1,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    129.73,
-    127.72,
-    121.3
+    104.06,
+    101.95,
+    95.02,
+    81.98
    ],
-   "invalidation": 106.74,
-   "reached": []
-  },
-  "ITW": {
-   "price": 272.28,
-   "score": 11.1,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    272.28,
-    267.94,
-    251.28
-   ],
-   "invalidation": 221.13,
+   "invalidation": 72.14,
    "reached": []
   },
   "NWS": {
-   "price": 32.88,
+   "price": 32.9,
    "score": 11.1,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    32.88,
+    32.9,
     32.07,
-    30.2,
+    30.21,
     27.84
    ],
    "invalidation": 24.5,
    "reached": []
   },
-  "TJX": {
-   "price": 147.33,
-   "score": 10.9,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    147.33,
-    141.59,
-    135.86,
-    122.84
-   ],
-   "invalidation": 108.1,
-   "reached": []
-  },
   "RCL": {
-   "price": 277.68,
-   "score": 10.9,
+   "price": 281.97,
+   "score": 11.1,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    277.68,
+    281.97,
     273.11,
-    258.98,
-    240.29
+    254.28,
+    245.14
    ],
-   "invalidation": 211.46,
-   "reached": []
-  },
-  "GNRC": {
-   "price": 192.68,
-   "score": 10.9,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    192.68,
-    175.03,
-    151.16
-   ],
-   "invalidation": 133.02,
-   "reached": []
-  },
-  "HSY": {
-   "price": 170.83,
-   "score": 10.8,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    170.83,
-    163.99,
-    157.61
-   ],
-   "invalidation": 138.7,
+   "invalidation": 215.72,
    "reached": []
   },
   "SO": {
-   "price": 91.18,
-   "score": 10.8,
+   "price": 89.27,
+   "score": 11.1,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    91.18,
-    88.27,
+    89.27,
+    86.29,
     82.35
    ],
    "invalidation": 72.47,
    "reached": []
   },
-  "AMCR": {
-   "price": 43.85,
+  "WTW": {
+   "price": 314.45,
+   "score": 11.1,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    314.45,
+    301.51,
+    286.08,
+    241.24
+   ],
+   "invalidation": 212.29,
+   "reached": []
+  },
+  "PEG": {
+   "price": 70.32,
+   "score": 11.1,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    70.32,
+    67.59,
+    64.86
+   ],
+   "invalidation": 57.08,
+   "reached": []
+  },
+  "ARES": {
+   "price": 113.0,
+   "score": 11.0,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    113.0,
+    109.95,
+    105.27,
+    98.42
+   ],
+   "invalidation": 86.61,
+   "reached": []
+  },
+  "SPG": {
+   "price": 202.49,
+   "score": 11.0,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    202.49,
+    196.14,
+    182.55
+   ],
+   "invalidation": 160.64,
+   "reached": []
+  },
+  "WEC": {
+   "price": 107.0,
+   "score": 11.0,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    107.0,
+    104.43,
+    99.71
+   ],
+   "invalidation": 87.74,
+   "reached": []
+  },
+  "GNRC": {
+   "price": 193.31,
+   "score": 10.9,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    193.31,
+    175.03,
+    153.26
+   ],
+   "invalidation": 134.87,
+   "reached": []
+  },
+  "PEP": {
+   "price": 133.57,
+   "score": 10.9,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    133.57,
+    128.02,
+    122.46
+   ],
+   "invalidation": 107.76,
+   "reached": []
+  },
+  "TJX": {
+   "price": 147.36,
+   "score": 10.9,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    147.36,
+    141.71,
+    136.05,
+    122.84
+   ],
+   "invalidation": 108.1,
+   "reached": []
+  },
+  "ITW": {
+   "price": 270.17,
+   "score": 10.8,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    270.17,
+    265.85,
+    249.6
+   ],
+   "invalidation": 219.65,
+   "reached": []
+  },
+  "AOS": {
+   "price": 58.68,
    "score": 10.7,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    43.85,
-    42.02,
+    58.68,
+    55.84,
+    53.01
+   ],
+   "invalidation": 46.65,
+   "reached": []
+  },
+  "OKE": {
+   "price": 92.42,
+   "score": 10.7,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    92.42,
+    89.95,
+    86.5,
+    83.02
+   ],
+   "invalidation": 73.06,
+   "reached": []
+  },
+  "FLEX": {
+   "price": 87.54,
+   "score": 10.6,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    87.54,
+    74.42,
+    65.46,
+    61.3
+   ],
+   "invalidation": 53.94,
+   "reached": []
+  },
+  "BRO": {
+   "price": 69.22,
+   "score": 10.6,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    69.22,
+    67.28,
+    62.36,
+    54.25
+   ],
+   "invalidation": 47.74,
+   "reached": []
+  },
+  "CCL": {
+   "price": 26.45,
+   "score": 10.6,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    26.45,
+    24.74,
+    23.03,
+    21.79
+   ],
+   "invalidation": 19.18,
+   "reached": []
+  },
+  "DTE": {
+   "price": 126.93,
+   "score": 10.6,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    126.93,
+    122.55,
+    118.18
+   ],
+   "invalidation": 104.0,
+   "reached": []
+  },
+  "AMCR": {
+   "price": 43.95,
+   "score": 10.6,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    43.95,
+    42.12,
     40.48,
     38.32
    ],
    "invalidation": 33.72,
    "reached": []
   },
-  "NEE": {
-   "price": 79.8,
-   "score": 10.7,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    79.8,
-    77.13
-   ],
-   "invalidation": 67.87,
-   "reached": []
-  },
-  "WRB": {
-   "price": 75.42,
-   "score": 10.7,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    75.42,
-    72.59,
-    69.75,
-    62.88
-   ],
-   "invalidation": 55.33,
-   "reached": []
-  },
-  "AOS": {
-   "price": 59.22,
-   "score": 10.7,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    59.22,
-    56.35,
-    53.48
-   ],
-   "invalidation": 47.06,
-   "reached": []
-  },
-  "PEP": {
-   "price": 131.49,
-   "score": 10.7,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    131.49,
-    126.04,
-    120.59
-   ],
-   "invalidation": 106.12,
-   "reached": []
-  },
   "EXE": {
-   "price": 93.41,
-   "score": 10.7,
+   "price": 92.92,
+   "score": 10.6,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    93.41,
-    91.94,
-    84.45
+    92.92,
+    88.5,
+    84.09
    ],
-   "invalidation": 74.32,
+   "invalidation": 74.0,
    "reached": []
   },
   "SMCI": {
-   "price": 31.63,
+   "price": 32.1,
    "score": 10.6,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    31.63,
+    32.1,
     27.92,
-    26.53,
-    21.44
+    22.19
    ],
-   "invalidation": 18.87,
+   "invalidation": 19.53,
    "reached": []
   },
-  "UNH": {
-   "price": 401.43,
-   "score": 10.6,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    401.43,
-    391.36,
-    377.26,
-    355.62
-   ],
-   "invalidation": 312.95,
-   "reached": []
-  },
-  "BRO": {
-   "price": 69.4,
-   "score": 10.6,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    69.4,
-    67.28,
-    62.4,
-    54.25
-   ],
-   "invalidation": 47.74,
-   "reached": []
-  },
-  "RDDT": {
-   "price": 156.14,
+  "BAC": {
+   "price": 50.39,
    "score": 10.5,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    156.14,
+    50.39,
+    48.25,
+    45.12
+   ],
+   "invalidation": 39.71,
+   "reached": []
+  },
+  "NEE": {
+   "price": 78.17,
+   "score": 10.4,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    78.17,
+    75.49,
+    72.68
+   ],
+   "invalidation": 63.96,
+   "reached": []
+  },
+  "RDDT": {
+   "price": 155.14,
+   "score": 10.4,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    155.14,
     151.18,
-    139.74,
-    124.13
+    138.89,
+    122.64
    ],
-   "invalidation": 109.23,
-   "reached": []
-  },
-  "OMC": {
-   "price": 80.56,
-   "score": 10.4,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    80.56,
-    79.13,
-    72.86,
-    69.37
-   ],
-   "invalidation": 61.05,
-   "reached": []
-  },
-  "EXC": {
-   "price": 43.5,
-   "score": 10.4,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    43.5,
-    42.16,
-    40.51
-   ],
-   "invalidation": 35.65,
-   "reached": []
-  },
-  "O": {
-   "price": 56.08,
-   "score": 10.4,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    56.08,
-    54.27
-   ],
-   "invalidation": 47.76,
-   "reached": []
-  },
-  "BAC": {
-   "price": 51.23,
-   "score": 10.4,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    51.23,
-    48.6,
-    46.75
-   ],
-   "invalidation": 41.14,
-   "reached": []
-  },
-  "CCL": {
-   "price": 25.9,
-   "score": 10.4,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    25.9,
-    24.29,
-    22.46
-   ],
-   "invalidation": 19.76,
-   "reached": []
-  },
-  "SWK": {
-   "price": 92.48,
-   "score": 10.3,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    92.48,
-    87.17,
-    83.34,
-    65.9
-   ],
-   "invalidation": 57.99,
+   "invalidation": 107.92,
    "reached": []
   },
   "EQT": {
-   "price": 54.3,
+   "price": 54.42,
+   "score": 10.4,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    54.42,
+    52.62,
+    49.09
+   ],
+   "invalidation": 43.2,
+   "reached": []
+  },
+  "CCI": {
+   "price": 81.06,
    "score": 10.3,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    54.3,
-    52.62,
-    48.81
+    81.06,
+    76.78,
+    72.09,
+    66.12
    ],
-   "invalidation": 42.95,
+   "invalidation": 58.19,
    "reached": []
   },
   "ALLE": {
-   "price": 156.54,
-   "score": 10.2,
+   "price": 155.44,
+   "score": 10.3,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    156.54,
+    155.44,
     151.21,
     144.95,
     136.04
@@ -740,233 +713,180 @@
    "invalidation": 119.72,
    "reached": []
   },
-  "BMY": {
-   "price": 59.75,
+  "AMT": {
+   "price": 183.03,
    "score": 10.2,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    59.75,
-    56.16,
-    53.4
+    183.03,
+    176.67,
+    167.74,
+    161.06
    ],
-   "invalidation": 46.99,
+   "invalidation": 141.73,
    "reached": []
   },
   "VRT": {
-   "price": 206.42,
+   "price": 206.08,
    "score": 10.2,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    206.42,
-    183.39,
-    160.36
+    206.08,
+    183.37,
+    160.66
    ],
-   "invalidation": 141.12,
+   "invalidation": 141.38,
    "reached": []
   },
-  "GM": {
-   "price": 83.96,
-   "score": 10.2,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    83.96,
-    82.01,
-    75.24,
-    72.23
-   ],
-   "invalidation": 63.56,
-   "reached": []
-  },
-  "ES": {
-   "price": 66.85,
-   "score": 10.2,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    66.85,
-    65.68,
-    63.28
-   ],
-   "invalidation": 55.69,
-   "reached": []
-  },
-  "CMS": {
-   "price": 68.7,
+  "PNW": {
+   "price": 101.17,
    "score": 10.1,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    68.7,
-    66.42,
-    62.6
+    101.17,
+    98.59,
+    94.78,
+    91.08
    ],
-   "invalidation": 55.09,
+   "invalidation": 80.15,
    "reached": []
   },
-  "DUK": {
-   "price": 121.47,
+  "AIZ": {
+   "price": 280.56,
    "score": 10.1,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    121.47,
-    117.92,
-    113.23
+    280.56,
+    270.16,
+    258.86,
+    214.93
    ],
-   "invalidation": 99.64,
+   "invalidation": 189.14,
    "reached": []
   },
-  "OKE": {
-   "price": 93.31,
+  "DAL": {
+   "price": 74.63,
    "score": 10.1,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    93.31,
-    91.39,
-    87.89,
-    83.72
+    74.63,
+    69.49,
+    65.29
    ],
-   "invalidation": 73.67,
-   "reached": []
-  },
-  "FLEX": {
-   "price": 90.46,
-   "score": 10.1,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    90.46,
-    77.35,
-    64.24,
-    60.57
-   ],
-   "invalidation": 53.3,
-   "reached": []
-  },
-  "INVH": {
-   "price": 27.07,
-   "score": 10.1,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    27.07,
-    26.14,
-    25.22,
-    24.25
-   ],
-   "invalidation": 21.34,
-   "reached": []
-  },
-  "UNP": {
-   "price": 289.04,
-   "score": 10.1,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    289.04,
-    279.8,
-    265.19,
-    236.89
-   ],
-   "invalidation": 208.46,
-   "reached": []
-  },
-  "D": {
-   "price": 63.56,
-   "score": 10.0,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    63.56,
-    62.57,
-    59.74
-   ],
-   "invalidation": 52.57,
-   "reached": []
-  },
-  "KIM": {
-   "price": 22.91,
-   "score": 10.0,
-   "fin_score": null,
-   "grade": null,
-   "rung_prices": [
-    22.91,
-    22.22
-   ],
-   "invalidation": 19.55,
+   "invalidation": 57.46,
    "reached": []
   },
   "TPL": {
-   "price": 350.92,
+   "price": 344.61,
+   "score": 10.1,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    344.61,
+    325.83,
+    295.85
+   ],
+   "invalidation": 260.35,
+   "reached": []
+  },
+  "O": {
+   "price": 55.51,
+   "score": 10.1,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    55.51,
+    53.73
+   ],
+   "invalidation": 47.28,
+   "reached": []
+  },
+  "GM": {
+   "price": 82.75,
    "score": 10.0,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    350.92,
-    326.42,
-    301.93
+    82.75,
+    80.42,
+    74.19
    ],
-   "invalidation": 265.7,
+   "invalidation": 65.29,
+   "reached": []
+  },
+  "UNH": {
+   "price": 406.88,
+   "score": 10.0,
+   "fin_score": null,
+   "grade": null,
+   "rung_prices": [
+    406.88,
+    399.44,
+    383.13,
+    359.37
+   ],
+   "invalidation": 316.25,
    "reached": []
   },
   "WDC": {
-   "price": 332.0,
+   "price": 352.21,
    "score": 15.7,
    "fin_score": 81.6,
    "grade": "C",
    "rung_prices": [
-    332.0,
-    281.13,
-    251.52,
-    230.25
+    352.21,
+    301.5,
+    270.33,
+    250.8
    ],
-   "invalidation": 202.62,
+   "invalidation": 220.7,
    "reached": []
   },
   "ROP": {
-   "price": 382.71,
+   "price": 383.5,
    "score": 12.7,
    "fin_score": 72.5,
    "grade": "C",
    "rung_prices": [
-    382.71,
-    364.37,
-    346.03,
+    383.5,
+    365.55,
+    347.59,
     315.46
    ],
    "invalidation": 277.6,
    "reached": []
   },
   "T": {
-   "price": 23.44,
-   "score": 14.3,
+   "price": 23.2,
+   "score": 14.2,
    "fin_score": 69.7,
    "grade": "C",
    "rung_prices": [
-    23.44,
-    22.17,
-    20.91
+    23.2,
+    21.97,
+    20.74
    ],
-   "invalidation": 18.4,
+   "invalidation": 18.25,
    "reached": []
   },
   "AKAM": {
-   "price": 87.81,
-   "score": 15.9,
+   "price": 87.25,
+   "score": 16.0,
    "fin_score": 57.4,
    "grade": "C",
    "rung_prices": [
-    87.81,
-    75.35,
-    62.9
+    87.25,
+    75.11,
+    62.97
    ],
-   "invalidation": 55.35,
+   "invalidation": 55.41,
    "reached": []
   }
  },
- "updated": "2026-10-18T22:14:57"
+ "updated": "2026-10-19T22:21:56"
 }
