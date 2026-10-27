@@ -1,3 +1,5 @@
+import sys, io
+_buf=io.StringIO(); _o=sys.stdout; sys.stdout=_buf
 import yfinance as yf, pandas as pd
 for sym in ["TQQQ","QQQ","NQ=F"]:
     df=yf.download(sym,period="2d",interval="1m",prepost=True,progress=False,auto_adjust=False)
@@ -10,3 +12,5 @@ for sym in ["TQQQ","QQQ","NQ=F"]:
     for hh in ("10:00","11:00","12:00","13:00"):
         p=day[day.index<=pd.Timestamp(f"{d} {hh}",tz="America/New_York")]
         if len(p) and p.index[-1].strftime("%H:%M")>="09:30": print("  ",hh,round(float(p.Close.iloc[-1]),2))
+
+sys.stdout=_o; open('lab/results/today.txt','w').write(_buf.getvalue()); print(_buf.getvalue())
