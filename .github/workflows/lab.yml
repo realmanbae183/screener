@@ -12,7 +12,7 @@ on:
       script:
         description: "mnq = 기본 전략 5종 / combo = 지표 10개 조합 / exits = 사고파는 규칙 전수 시험"
         type: choice
-        options: ["mnq", "combo", "exits", "curves", "orb", "orb2", "level", "replay"]
+        options: ["mnq", "combo", "exits", "curves", "orb", "orb2", "level", "replay", "today"]
         default: "mnq"
       cost:
         description: "편도 비용 $ (수수료 7.5면 8, 수수료 1이면 1.5)"
