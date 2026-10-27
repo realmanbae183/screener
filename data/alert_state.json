@@ -26,20 +26,6 @@
    "invalidation": 167.11,
    "reached": []
   },
-  "HIG": {
-   "price": 135.94,
-   "score": 12.4,
-   "fin_score": 89.8,
-   "grade": "B",
-   "rung_prices": [
-    135.94,
-    133.7,
-    127.21,
-    122.36
-   ],
-   "invalidation": 107.68,
-   "reached": []
-  },
   "APO": {
    "price": 114.37,
    "score": 12.7,
@@ -57,7 +43,7 @@
   "ABNB": {
    "price": 171.05,
    "score": 12.3,
-   "fin_score": 77.0,
+   "fin_score": 77.2,
    "grade": "B",
    "rung_prices": [
     171.05,
@@ -71,7 +57,7 @@
   "AFL": {
    "price": 120.93,
    "score": 13.3,
-   "fin_score": 71.0,
+   "fin_score": 70.9,
    "grade": "B",
    "rung_prices": [
     120.93,
@@ -84,7 +70,7 @@
   "PAYX": {
    "price": 115.7,
    "score": 12.6,
-   "fin_score": 65.8,
+   "fin_score": 66.2,
    "grade": "B",
    "rung_prices": [
     115.7,
@@ -825,6 +811,20 @@
    "invalidation": 416.64,
    "reached": []
   },
+  "HIG": {
+   "price": 135.94,
+   "score": 12.4,
+   "fin_score": 89.8,
+   "grade": "C",
+   "rung_prices": [
+    135.94,
+    133.7,
+    127.21,
+    122.36
+   ],
+   "invalidation": 107.68,
+   "reached": []
+  },
   "AMP": {
    "price": 493.6,
    "score": 13.3,
@@ -841,7 +841,7 @@
   "KLAC": {
    "price": 149.21,
    "score": 15.2,
-   "fin_score": 81.7,
+   "fin_score": 81.5,
    "grade": "C",
    "rung_prices": [
     149.21,
@@ -855,7 +855,7 @@
   "EME": {
    "price": 665.93,
    "score": 12.7,
-   "fin_score": 73.4,
+   "fin_score": 73.3,
    "grade": "C",
    "rung_prices": [
     665.93,
@@ -869,7 +869,7 @@
   "DAL": {
    "price": 79.16,
    "score": 14.3,
-   "fin_score": 68.4,
+   "fin_score": 68.3,
    "grade": "C",
    "rung_prices": [
     79.16,
@@ -897,7 +897,7 @@
   "MGM": {
    "price": 28.54,
    "score": 14.2,
-   "fin_score": 54.5,
+   "fin_score": 54.7,
    "grade": "C",
    "rung_prices": [
     28.54,
@@ -925,7 +925,7 @@
   "NI": {
    "price": 43.44,
    "score": 12.5,
-   "fin_score": 44.6,
+   "fin_score": 44.5,
    "grade": "C",
    "rung_prices": [
     43.44,
@@ -937,5 +937,5 @@
    "reached": []
   }
  },
- "updated": "2026-10-26T22:24:51"
+ "updated": "2026-10-27T22:26:03"
 }
