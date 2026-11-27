@@ -103,7 +103,7 @@
    "rung_prices": [
     134.96,
     132.6,
-    119.93,
+    120.04,
     113.87
    ],
    "invalidation": 100.21,
@@ -130,10 +130,10 @@
    "rung_prices": [
     54.47,
     51.28,
-    43.41,
-    32.34
+    43.43,
+    32.4
    ],
-   "invalidation": 28.46,
+   "invalidation": 28.51,
    "reached": []
   },
   "KMI": {
@@ -238,10 +238,10 @@
    "rung_prices": [
     543.69,
     510.45,
-    484.13,
-    424.58
+    484.15,
+    424.6
    ],
-   "invalidation": 373.63,
+   "invalidation": 373.65,
    "reached": []
   },
   "TSLA": {
@@ -280,9 +280,9 @@
    "rung_prices": [
     174.66,
     164.92,
-    149.52
+    149.54
    ],
-   "invalidation": 131.58,
+   "invalidation": 131.6,
    "reached": []
   },
   "CBRE": {
@@ -348,7 +348,7 @@
    "rung_prices": [
     166.4,
     149.07,
-    130.29
+    130.3
    ],
    "invalidation": 114.66,
    "reached": []
@@ -512,10 +512,10 @@
    "rung_prices": [
     629.12,
     613.03,
-    587.51,
-    545.9
+    587.6,
+    546.08
    ],
-   "invalidation": 480.39,
+   "invalidation": 480.55,
    "reached": []
   },
   "PLTR": {
@@ -541,9 +541,9 @@
     46.36,
     44.81,
     42.52,
-    38.68
+    38.67
    ],
-   "invalidation": 34.04,
+   "invalidation": 34.03,
    "reached": []
   },
   "APO": {
@@ -554,9 +554,9 @@
    "rung_prices": [
     120.48,
     110.82,
-    101.15
+    101.16
    ],
-   "invalidation": 89.01,
+   "invalidation": 89.02,
    "reached": []
   },
   "TWLO": {
@@ -588,17 +588,17 @@
    "reached": []
   },
   "MCHP": {
-   "price": 57.66,
+   "price": 57.65,
    "score": 10.6,
    "fin_score": null,
    "grade": null,
    "rung_prices": [
-    57.66,
+    57.65,
     55.44,
-    49.22,
-    40.78
+    49.23,
+    40.81
    ],
-   "invalidation": 35.89,
+   "invalidation": 35.91,
    "reached": []
   },
   "TRMB": {
@@ -623,7 +623,7 @@
    "rung_prices": [
     203.99,
     198.7,
-    178.08,
+    178.07,
     152.16
    ],
    "invalidation": 133.9,
@@ -703,9 +703,9 @@
    "rung_prices": [
     155.7,
     149.6,
-    141.07
+    141.17
    ],
-   "invalidation": 124.14,
+   "invalidation": 124.23,
    "reached": []
   },
   "IBM": {
@@ -736,5 +736,5 @@
    "reached": []
   }
  },
- "updated": "2026-11-26T03:54:20"
+ "updated": "2026-11-27T03:56:32"
 }
